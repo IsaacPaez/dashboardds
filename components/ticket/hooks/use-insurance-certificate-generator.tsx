@@ -303,6 +303,45 @@ export function useInsuranceCertificateGenerator() {
             }
           }
 
+          // Si hay menos de 3 estudiantes, dibujar cuadros blancos en las posiciones vacías
+          // Insurance usa offsets: POSITION_2_OFFSET = 273, POSITION_3_OFFSET = 548
+          if (studentsGroup.length < 3) {
+            const POSITION_2_OFFSET = 273;
+            const POSITION_3_OFFSET = 548;
+            
+            // Dibujar cuadro blanco para posición 2 si falta
+            if (studentsGroup.length === 1) {
+              // Cubrir posición 2 (middle): desde Y=273 hasta Y=548 (top-down)
+              // En coordenadas bottom-up: desde height-548 hasta height-273
+              firstPage.drawRectangle({
+                x: 0,
+                y: height - POSITION_3_OFFSET,
+                width: width,
+                height: POSITION_3_OFFSET - POSITION_2_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+              
+              // Cubrir posición 3 (bottom): desde Y=548 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-548
+              firstPage.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            } else if (studentsGroup.length === 2) {
+              // Solo cubrir posición 3 (bottom)
+              firstPage.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            }
+          }
+
           // Generar el PDF para este grupo
           const pdfBytes = await pdfDoc.save();
           pdfs.push(new Blob([pdfBytes as any], { type: "application/pdf" }));

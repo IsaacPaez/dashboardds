@@ -291,6 +291,49 @@ export function useAdiCertificateGenerator() {
             }
           }
 
+          // Si hay menos de 3 estudiantes, dibujar cuadros blancos en las posiciones vacías
+          // ADI usa las mismas posiciones que BDI, pero ajustado para cuando es 1 estudiante
+          if (chunk.length < 3) {
+            const { width } = page.getSize();
+            
+            // Dibujar cuadro blanco para posición 2 si falta
+            if (chunk.length === 1) {
+              // Bajar un tris los cuadros cuando es 1 estudiante (aumentar Y)
+              const POSITION_2_OFFSET = 273; // Aumentado desde 270 para bajar un tris
+              const POSITION_3_OFFSET = 548; // Aumentado desde 545 para bajar un tris
+              
+              // Cubrir posición 2 (middle): desde Y=273 hasta Y=548 (top-down)
+              // En coordenadas bottom-up: desde height-548 hasta height-273
+              page.drawRectangle({
+                x: 0,
+                y: height - POSITION_3_OFFSET,
+                width: width,
+                height: POSITION_3_OFFSET - POSITION_2_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+              
+              // Cubrir posición 3 (bottom): desde Y=548 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-548
+              page.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            } else if (chunk.length === 2) {
+              // Solo cubrir posición 3 (bottom) - ajustado a 273
+              const POSITION_3_OFFSET_2_STUDENTS = 273; // Ajustado a 273
+              page.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET_2_STUDENTS,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            }
+          }
+
           const pdfBytes = await pdfDoc.save();
           pdfs.push(new Blob([pdfBytes as any], { type: "application/pdf" }));
         }

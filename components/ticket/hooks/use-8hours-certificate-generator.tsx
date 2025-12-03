@@ -362,6 +362,47 @@ export function use8HoursCertificateGenerator() {
             }
           }
 
+          // Si hay menos de 3 estudiantes, dibujar cuadros blancos en las posiciones vacías
+          // 8-hours usa offsets aproximados: POSITION_2_OFFSET ≈ 280, POSITION_3_OFFSET ≈ 560
+          // Subido un 1% más (disminuir Y aproximadamente 1%)
+          if (chunk.length < 3) {
+            const { width } = page.getSize();
+            const POSITION_2_OFFSET = 272; // 275 * 0.99 ≈ 272 (1% menos)
+            const POSITION_3_OFFSET = 552; // Ajustado a 552
+            
+            // Dibujar cuadro blanco para posición 2 si falta
+            if (chunk.length === 1) {
+              // Cubrir posición 2 (middle): desde Y=275 hasta Y=555 (top-down)
+              // En coordenadas bottom-up: desde height-555 hasta height-275
+              page.drawRectangle({
+                x: 0,
+                y: height - POSITION_3_OFFSET,
+                width: width,
+                height: POSITION_3_OFFSET - POSITION_2_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+              
+              // Cubrir posición 3 (bottom): desde Y=555 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-555
+              page.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            } else if (chunk.length === 2) {
+              // Solo cubrir posición 3 (bottom) - también subido un tris
+              page.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            }
+          }
+
           const pdfBytes = await pdfDoc.save();
           pdfs.push(new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" }));
         }

@@ -355,6 +355,45 @@ export function useYouthfulOffenderCertificateGenerator() {
             }
           }
 
+          // Si hay menos de 3 estudiantes, dibujar cuadros blancos en las posiciones vacías
+          // Youthful Offender usa offsets: POSITION_2_OFFSET = 281, POSITION_3_OFFSET = 562
+          if (studentsGroup.length < 3) {
+            const POSITION_2_OFFSET = 281;
+            const POSITION_3_OFFSET = 562;
+            
+            // Dibujar cuadro blanco para posición 2 si falta
+            if (studentsGroup.length === 1) {
+              // Cubrir posición 2 (middle): desde Y=281 hasta Y=562 (top-down)
+              // En coordenadas bottom-up: desde height-562 hasta height-281
+              firstPage.drawRectangle({
+                x: 0,
+                y: height - POSITION_3_OFFSET,
+                width: width,
+                height: POSITION_3_OFFSET - POSITION_2_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+              
+              // Cubrir posición 3 (bottom): desde Y=562 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-562
+              firstPage.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            } else if (studentsGroup.length === 2) {
+              // Solo cubrir posición 3 (bottom)
+              firstPage.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height - POSITION_3_OFFSET,
+                color: rgb(1, 1, 1), // Blanco
+              });
+            }
+          }
+
           // Generar el PDF para este grupo
           const pdfBytes = await pdfDoc.save();
           pdfs.push(new Blob([pdfBytes as any], { type: "application/pdf" }));

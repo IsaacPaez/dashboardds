@@ -44,18 +44,18 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: '4hr', x: 215, y: 85 },
-      { value: '8hr (IDI)', x: 262, y: 85 },
-      { value: '8hr (Aggressive)', x: 315, y: 85 },
-      { value: '8hr (Suspension)', x: 392, y: 85 }
+      { value: '4hr', x: 199, y: 77 },
+      { value: '8hr (IDI)', x: 257, y: 77 },
+      { value: '8hr (Aggressive)', x: 320, y: 77 },
+      { value: '8hr (Suspension)', x: 408, y: 77 }
     ]
   },
 
   // Citation/Case No
   citationNumber: {
     x: 195,
-    y: 103,
-    fontSize: 8,
+    y: 98,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 180
@@ -63,19 +63,19 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // Circuit Court No
   circuitCourtNo: {
-    x: 366,
-    y: 103,
-    fontSize: 8,
+    x: 387,
+    y: 96,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 100
-  },
+  },  
 
   // County
   county: {
-    x: 480,
-    y: 103,
-    fontSize: 8,
+    x: 500,
+    y: 96,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 80
@@ -88,16 +88,16 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: 'Court Order', x: 286, y: 130 },
-      { value: 'Volunteer', x: 359, y: 130 }
+      { value: 'Court Order', x: 288, y: 119 },
+      { value: 'Volunteer', x: 356, y: 119 }
     ]
   },
 
   // NAME - First
   firstName: {
-    x: 114,
-    y: 147,
-    fontSize: 8,
+    x: 116,
+    y: 135,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 120
@@ -105,9 +105,9 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // NAME - MI (Middle Initial)
   middleName: {
-    x: 182,
-    y: 147,
-    fontSize: 8,
+    x: 175,
+    y: 135,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 25
@@ -116,8 +116,8 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
   // NAME - Last
   lastName: {
     x:276,
-    y: 147,
-    fontSize: 8,
+    y: 135,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 150
@@ -126,7 +126,7 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
   // Drivers License No
   licenseNumber: {
     x: 170,
-    y: 180,
+    y: 167,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -136,7 +136,7 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
   // Completion Date (Mo, Day, Yr)
   courseDate: {
     x: 338,
-    y: 180,
+    y: 167,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
@@ -153,9 +153,9 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // School Official
   schoolOfficial: {
-    x:136,
-    y: 210,
-    fontSize: 7,
+    x:140,
+    y: 190,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -163,8 +163,8 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // Certificate Number (campo existente: certn)
   certn: {
-    x: 510,
-    y: 85,
+    x: 546,
+    y: 67,
     fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -173,9 +173,9 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // School Address (nuevo campo)
   schoolAddress: {
-    x: 136,
-    y: 222,
-    fontSize: 7,
+    x: 140,
+    y: 202,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 300
@@ -183,9 +183,9 @@ export const POSITION_1_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // School Phone (nuevo campo)
   schoolPhone: {
-    x: 136,
-    y: 232,
-    fontSize: 7,
+    x: 140  ,
+    y: 212,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -203,35 +203,35 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: '4hr', x: 215, y: 365 },
-      { value: '8hr (IDI)', x: 262, y: 365 },
-      { value: '8hr (Aggressive)', x: 315, y: 365 },
-      { value: '8hr (Suspension)', x: 392, y: 365 }
+      { value: '4hr', x: 195, y: 342 },
+      { value: '8hr (IDI)', x: 252, y: 342 },
+      { value: '8hr (Aggressive)', x: 316, y: 342 },
+      { value: '8hr (Suspension)', x: 408, y: 342 }
     ]
   },
 
   citationNumber: {
     x: 195,
-    y: 383,
-    fontSize: 8,
+    y: 362,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 180
   },
 
   circuitCourtNo: {
-    x: 366,
-    y: 383,
-    fontSize: 8,
+    x: 390,
+    y: 362,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 100
   },
 
   county: {
-    x: 480,
-    y: 383,
-    fontSize: 8,
+    x: 505,
+    y: 362,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 80
@@ -243,15 +243,15 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: 'Court Order', x: 286, y: 410 },
-      { value: 'Volunteer', x: 359, y: 410 }
+      { value: 'Court Order', x: 286, y: 384 },
+      { value: 'Volunteer', x: 355, y: 383 }
     ]
   },
 
   firstName: {
-    x: 114,
-    y: 427,
-    fontSize: 8,
+    x: 120,
+    y: 399,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 120
@@ -259,8 +259,8 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   middleName: {
     x: 182,
-    y: 427,
-    fontSize: 8,
+    y: 399,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 25
@@ -268,8 +268,8 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   lastName: {
     x: 276,
-    y: 427,
-    fontSize: 8,
+    y: 399,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 150
@@ -277,7 +277,7 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   licenseNumber: {
     x: 170,
-    y: 460,
+    y: 432,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -285,25 +285,25 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
   },
 
   courseDate: {
-    x: 338,
-    y: 460,
+    x: 340,
+    y: 432,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   instructorSignature: {
-    x: 460,
-    y: 490,
+    x: 470,
+    y: 465,
     fontSize: 0,
     align: 'center',
     maxWidth: 150
   },
 
   schoolOfficial: {
-    x: 136,
-    y: 490,
-    fontSize: 7,
+    x: 136 ,
+    y: 455,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -311,8 +311,8 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // Certificate Number (campo existente: certn)
   certn: {
-    x: 510,
-    y: 365,
+    x: 542,
+    y: 332,
     fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -322,8 +322,8 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
   // School Address (nuevo campo)
   schoolAddress: {
     x: 136,
-    y: 502 ,
-    fontSize: 7,
+    y: 466,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 300
@@ -332,8 +332,8 @@ export const POSITION_2_COORDINATES: Record<string, Field8HoursCoordinate> = {
   // School Phone (nuevo campo)
   schoolPhone: {
     x: 136,
-    y: 512,
-    fontSize: 7,
+    y: 478,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -351,25 +351,25 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: '4hr', x: 215, y: 645 },
-      { value: '8hr (IDI)', x: 262, y: 645 },
-      { value: '8hr (Aggressive)', x: 315, y: 645 },
-      { value: '8hr (Suspension)', x: 392, y: 645 }
+      { value: '4hr', x: 200, y: 606 },
+      { value: '8hr (IDI)', x: 255, y: 606 },
+      { value: '8hr (Aggressive)', x: 315, y: 606 },
+      { value: '8hr (Suspension)', x: 408, y: 606  }
     ]
   },
 
   citationNumber: {
     x: 195,
-    y: 663,
-    fontSize: 8,
+    y: 627,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 180
   },
 
   circuitCourtNo: {
-    x: 366,
-    y: 663,
+    x: 390,
+    y: 626,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -377,9 +377,9 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
   },
 
   county: {
-    x: 480,
-    y: 663,
-    fontSize: 8,
+    x: 500,
+    y: 625,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 80
@@ -391,33 +391,33 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
     align: 'center',
     isCheckbox: true,
     checkboxOptions: [
-      { value: 'Court Order', x: 286, y: 691 },
-      { value: 'Volunteer', x: 359, y: 691 }
+      { value: 'Court Order', x: 288, y: 648 },
+      { value: 'Volunteer', x: 357, y: 648 }
     ]
   },
 
   firstName: {
-    x: 114,
-    y: 707,
-    fontSize: 8,
+    x: 115,
+    y: 662,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 120
   },
 
   middleName: {
-    x: 182,
-    y: 707,
-    fontSize: 8,
+    x: 215,
+    y: 662,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 25
   },
 
   lastName: {
-    x: 276,
-    y: 707,
-    fontSize: 8,
+    x: 300,
+    y: 662,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 150
@@ -425,7 +425,7 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   licenseNumber: {
     x: 170,
-    y: 740,
+    y: 695,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -433,25 +433,25 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
   },
 
   courseDate: {
-    x: 338,
-    y: 740,
+    x: 342,
+    y: 695,
     fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   instructorSignature: {
-    x: 460,
-    y: 770,
+    x: 465,
+    y: 731,
     fontSize: 0,
     align: 'center',
     maxWidth: 150
   },
 
   schoolOfficial: {
-    x: 136,
-    y: 770,
-    fontSize: 7,
+    x: 145,
+    y: 720,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -459,8 +459,8 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // Certificate Number (campo existente: certn)
   certn: {
-    x: 510,
-    y: 645,
+    x: 545,
+    y: 595,
     fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -469,9 +469,9 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // School Address (nuevo campo)
   schoolAddress: {
-    x: 136,
-    y: 782,
-    fontSize: 7,
+    x: 145,
+    y: 732,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 300
@@ -479,9 +479,9 @@ export const POSITION_3_COORDINATES: Record<string, Field8HoursCoordinate> = {
 
   // School Phone (nuevo campo)
   schoolPhone: {
-    x: 136,
-    y: 792,
-    fontSize: 7,
+    x: 145,
+    y: 744,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150

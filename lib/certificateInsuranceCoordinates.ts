@@ -43,9 +43,9 @@ const POSITION_3_OFFSET = 548; // Offset para el tercer certificado
 export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoordinate> = {
   // Citation No
   citationNumber: {
-    x: 260,
-    y: 118,
-    fontSize: 7,
+    x: 295,
+    y: 97,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -53,9 +53,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Certificate Number (al lado de "Certificate #:")
   certn: {
-    x: 415,
-    y: 128,
-    fontSize: 7,
+    x: 456,
+    y: 107,
+    fontSize:9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
@@ -63,9 +63,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Driver License Number (primera posición - donde estaba Certificate #)
   licenseNumber: {
-    x: 260,
-    y: 130,
-    fontSize: 7,
+    x: 295,
+    y: 109,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -73,9 +73,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Driver License Number (segunda posición - donde dice Driver License Number)
   licenseNumber2: {
-    x: 463,
-    y: 210,
-    fontSize: 7,
+    x: 457,
+    y: 203,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -83,18 +83,18 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Course Completion Date
   courseDate: {
-    x: 260,
-    y: 143,
-    fontSize: 7,
+    x: 295,
+    y: 122,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   // Name (Full name)
   firstName: {
-    x: 250,
-    y: 155,
-    fontSize: 7,
+    x: 285,
+    y: 135,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
@@ -102,9 +102,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Last Name
   lastName: {
-    x: 260,
-    y: 155,
-    fontSize: 7,
+    x: 295,
+    y: 135,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -112,9 +112,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Course Location
   address: {
-    x: 260,
-    y: 168,
-    fontSize: 7,
+    x: 295,
+    y: 147,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
@@ -122,9 +122,9 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
 
   // Instructor Signature
   instructorSignature: {
-    x: 100,
-    y: 209,
-    fontSize: 7,
+    x: 155,
+    y: 202,
+    fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -137,80 +137,80 @@ export const POSITION_1_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
  */
 export const POSITION_2_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoordinate> = {
   citationNumber: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.citationNumber.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 364,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   certn: {
-    x: 415,
-    y: POSITION_1_INSURANCE_COORDINATES.certn.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 453,
+    y: 372,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
   },
 
   licenseNumber: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.licenseNumber.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 375,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   licenseNumber2: {
-    x: 463,
-    y: POSITION_1_INSURANCE_COORDINATES.licenseNumber2.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 456,
+    y: 474,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   courseDate: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.courseDate.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 387,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   firstName: {
-    x: 250,
-    y: POSITION_1_INSURANCE_COORDINATES.firstName.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 401,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
   },
 
   lastName: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.lastName.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 401,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
   },
 
   address: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.address.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 412,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
   },
 
   instructorSignature: {
-    x: 100,
-    y: POSITION_1_INSURANCE_COORDINATES.instructorSignature.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 140,
+    y: 471,
+    fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -223,80 +223,80 @@ export const POSITION_2_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoor
  */
 export const POSITION_3_INSURANCE_COORDINATES: Record<string, FieldInsuranceCoordinate> = {
   citationNumber: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.citationNumber.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 630,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   certn: {
-    x: 415,
-    y: POSITION_1_INSURANCE_COORDINATES.certn.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 450,
+    y: 639,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
   },
 
   licenseNumber: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.licenseNumber.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 641,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   licenseNumber2: {
-    x: 463,
-    y: POSITION_1_INSURANCE_COORDINATES.licenseNumber2.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 450,
+    y: 738,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   courseDate: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.courseDate.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 654,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   firstName: {
-    x: 250,
-    y: POSITION_1_INSURANCE_COORDINATES.firstName.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 668,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
   },
 
   lastName: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.lastName.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 668,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
   },
 
   address: {
-    x: 260,
-    y: POSITION_1_INSURANCE_COORDINATES.address.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 679,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
   },
 
   instructorSignature: {
-    x: 100,
-    y: POSITION_1_INSURANCE_COORDINATES.instructorSignature.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 145,
+    y: 732,
+    fontSize: 12,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200

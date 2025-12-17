@@ -304,41 +304,40 @@ export function useBdiCertificateGenerator() {
           }
 
           // Si hay menos de 3 estudiantes, dibujar cuadros blancos en las posiciones vacías
-          // BDI usa offsets: POSITION_2_OFFSET = 273, POSITION_3_OFFSET = 548
-          // Ajustado para SUBIR más los cuadros (disminuir Y)
+          // BDI usa offsets: POSITION_2_OFFSET = 204, POSITION_3_OFFSET = 408
+          // Ajustado para cubrir las líneas superiores de los certificados vacíos
           if (studentsGroup.length < 3) {
-            const POSITION_2_OFFSET = 270; // Disminuido para subir más
-            const POSITION_3_OFFSET = 545; // Disminuido para subir más
-            
+            const POSITION_2_START = 200; // Inicio de posición 2 - ajustado para cubrir línea superior
+            const POSITION_3_START = 404; // Inicio de posición 3 - ajustado para cubrir línea superior
+
             // Dibujar cuadro blanco para posición 2 si falta
             if (studentsGroup.length === 1) {
-              // Cubrir posición 2 (middle): desde Y=273 hasta Y=548 (top-down)
-              // En coordenadas bottom-up: desde height-548 hasta height-273
+              // Cubrir posición 2 (middle): desde Y=200 hasta Y=404 (top-down)
+              // En coordenadas bottom-up: desde height-404 hasta height-200
               firstPage.drawRectangle({
                 x: 0,
-                y: height - POSITION_3_OFFSET,
+                y: height - POSITION_3_START,
                 width: width,
-                height: POSITION_3_OFFSET - POSITION_2_OFFSET,
+                height: POSITION_3_START - POSITION_2_START,
                 color: rgb(1, 1, 1), // Blanco
               });
-              
-              // Cubrir posición 3 (bottom): desde Y=548 hasta Y=612 (top-down)
-              // En coordenadas bottom-up: desde 0 hasta height-548
+
+              // Cubrir posición 3 (bottom): desde Y=404 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-404
               firstPage.drawRectangle({
                 x: 0,
                 y: 0,
                 width: width,
-                height: height - POSITION_3_OFFSET,
+                height: height - POSITION_3_START,
                 color: rgb(1, 1, 1), // Blanco
               });
             } else if (studentsGroup.length === 2) {
-              // Solo cubrir posición 3 (bottom) - bajar un tris (aumentar Y)
-              const POSITION_3_OFFSET_2_STUDENTS = 547; // Ajustado a 547
+              // Solo cubrir posición 3 (bottom): desde Y=404 hasta Y=612
               firstPage.drawRectangle({
                 x: 0,
                 y: 0,
                 width: width,
-                height: height - POSITION_3_OFFSET_2_STUDENTS,
+                height: height - POSITION_3_START,
                 color: rgb(1, 1, 1), // Blanco
               });
             }

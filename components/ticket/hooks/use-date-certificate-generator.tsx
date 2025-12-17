@@ -75,7 +75,7 @@ export function useDateCertificateGenerator() {
 
       // birthDate (centrado) - solo posición 1
       if (data.birthDate && coordinates.birthDate) {
-        drawText(data.birthDate, coordinates.birthDate.x, coordinates.birthDate.y, 14, 'center');
+        drawText(data.birthDate, coordinates.birthDate.x, coordinates.birthDate.y, 16, 'center');
       }
 
       // certn - Certificate Number (centrado) - usar color personalizado y un poco más grande - solo posición 1
@@ -87,20 +87,21 @@ export function useDateCertificateGenerator() {
 
       // courseDate (centrado) - solo posición 1
       if (data.courseDate && coordinates.courseDate) {
-        drawText(data.courseDate, coordinates.courseDate.x, coordinates.courseDate.y, 12, 'center');
+        drawText(data.courseDate, coordinates.courseDate.x, coordinates.courseDate.y, 14, 'center');
       }
 
       // Dibujar cuadros blancos en las posiciones 2 y 3 para tapar los certificados vacíos
       // IMPORTANTE: Dibujar los cuadros DESPUÉS del contenido para que queden encima y tapen el template
       const { width } = firstPage.getSize();
-      
+
       // Basado en las coordenadas y el template: Posición 1 termina alrededor de Y=250
       // Necesitamos cubrir completamente desde después de posición 1 hasta el final del PDF (Y=612)
       // Usar un solo rectángulo grande que cubra todo desde Y=250 hasta Y=612
-      const POSITION_1_END = 250; // Fin aproximado de posición 1
-      
-      // Cubrir todo desde posición 1 hasta el final del PDF (top-down: desde Y=250 hasta Y=612)
-      // En coordenadas bottom-up: desde 0 hasta height-250
+      // Ajustado para cubrir las líneas superiores de los certificados 2 y 3
+      const POSITION_1_END = 240; // Fin aproximado de posición 1 - bajado para cubrir línea superior
+
+      // Cubrir todo desde posición 1 hasta el final del PDF (top-down: desde Y=240 hasta Y=612)
+      // En coordenadas bottom-up: desde 0 hasta height-240
       firstPage.drawRectangle({
         x: 0,
         y: 0,
@@ -207,7 +208,7 @@ export function useDateCertificateGenerator() {
             }
 
             if (coordinates.birthDate && birthDate) {
-              drawText(birthDate, coordinates.birthDate.x, coordinates.birthDate.y, 9, 'left');
+              drawText(birthDate, coordinates.birthDate.x, coordinates.birthDate.y, 11, 'left');
             }
 
             if (coordinates.certificateNumber && certificateNumber) {
@@ -217,7 +218,7 @@ export function useDateCertificateGenerator() {
             }
 
             if (coordinates.courseDate && courseDate) {
-              drawText(courseDate, coordinates.courseDate.x, coordinates.courseDate.y, 9, 'left');
+              drawText(courseDate, coordinates.courseDate.x, coordinates.courseDate.y, 11, 'left');
             }
           }
 
@@ -225,20 +226,20 @@ export function useDateCertificateGenerator() {
           // DATE usa coordenadas desde arriba
           // Basado en el código: Posición 1 (Y=125-210), Posición 2 (Y=405-490), Posición 3 (Y=680+)
           // El PDF tiene altura 612 (landscape)
-          // Aumentar los valores para cubrir más área
+          // Aumentar los valores para cubrir más área y líneas superiores
           if (studentsGroup.length < 3) {
             const { width } = firstPage.getSize();
-            // Ajustar los valores: bajar un poco más (aumentar Y para empezar más abajo)
+            // Ajustar los valores para cubrir las líneas superiores de los certificados vacíos
             // Posición 1 termina alrededor de Y=210, Posición 2 empieza en Y=405
             // Posición 2 termina alrededor de Y=490, Posición 3 empieza en Y=680 (ajustado para PDF de 612)
-            const POSITION_2_START = 270; // Bajado un poco más (aumentado Y)
+            const POSITION_2_START = 260; // Subido para cubrir línea superior del certificado 2
             const POSITION_2_END = 545;    // Bajado un poco más (aumentado Y)
-            const POSITION_3_START = 545; // Bajado un poco más (aumentado Y)
-            
+            const POSITION_3_START = 520; // Subido más para cubrir línea superior del certificado 3
+
             // Dibujar cuadro blanco para posición 2 si falta
             if (studentsGroup.length === 1) {
-              // Cubrir posición 2 (middle): desde Y=200 hasta Y=550 (top-down)
-              // En coordenadas bottom-up: desde height-550 hasta height-200
+              // Cubrir posición 2 (middle): desde Y=260 hasta Y=545 (top-down)
+              // En coordenadas bottom-up: desde height-545 hasta height-260
               firstPage.drawRectangle({
                 x: 0,
                 y: height - POSITION_2_END,
@@ -246,9 +247,9 @@ export function useDateCertificateGenerator() {
                 height: POSITION_2_END - POSITION_2_START,
                 color: rgb(1, 1, 1), // Blanco
               });
-              
-              // Cubrir posición 3 (bottom): desde Y=550 hasta Y=612 (top-down)
-              // En coordenadas bottom-up: desde 0 hasta height-550
+
+              // Cubrir posición 3 (bottom): desde Y=535 hasta Y=612 (top-down)
+              // En coordenadas bottom-up: desde 0 hasta height-535
               firstPage.drawRectangle({
                 x: 0,
                 y: 0,
@@ -257,7 +258,7 @@ export function useDateCertificateGenerator() {
                 color: rgb(1, 1, 1), // Blanco
               });
             } else if (studentsGroup.length === 2) {
-              // Solo cubrir posición 3 (bottom): desde Y=550 hasta Y=612
+              // Solo cubrir posición 3 (bottom): desde Y=535 hasta Y=612
               firstPage.drawRectangle({
                 x: 0,
                 y: 0,

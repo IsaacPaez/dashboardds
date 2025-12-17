@@ -43,9 +43,9 @@ const POSITION_3_OFFSET = 552; // Offset para el tercer certificado
 export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
   // Citation/Case No
   citationNumber: {
-    x: 259,
-    y: 115,
-    fontSize: 7,
+    x: 295,
+    y: 103,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -53,9 +53,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Certificate Number (al lado de "Certificate #:")
   certn: {
-    x: 444,
-    y: 125,
-    fontSize: 7,
+    x: 439,
+    y: 110,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
@@ -63,9 +63,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Driver License Number (primera posición)
   licenseNumber: {
-    x: 259,
-    y: 127,
-    fontSize: 7,
+    x: 290,
+    y: 115,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -73,9 +73,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Driver License Number (segunda posición)
   licenseNumber2: {
-    x: 475,
-    y: 210,
-    fontSize: 7,
+    x: 469,
+    y: 208,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -83,18 +83,18 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Course Completion Date
   courseDate: {
-    x: 259,
-    y: 139,
-    fontSize: 7,
+    x: 290,
+    y:126,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   // Name (Full name)
   firstName: {
-    x: 250,
-    y: 152,
-    fontSize: 7,
+    x: 290,
+    y: 139,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
@@ -102,9 +102,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Last Name
   lastName: {
-    x: 265,
-    y: 152,
-    fontSize: 7,
+    x: 296,
+    y: 139,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
@@ -112,9 +112,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Course Location
   address: {
-    x: 259,
-    y: 167,
-    fontSize: 7,
+    x: 290,
+    y: 152,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
@@ -122,9 +122,9 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Instructor Signature
   instructorSignature: {
-    x: 100,
-    y: 200,
-    fontSize: 7,
+    x: 130,
+    y: 203,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
@@ -137,71 +137,71 @@ export const POSITION_1_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
  */
 export const POSITION_2_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
   citationNumber: {
-    x: POSITION_1_ADI_COORDINATES.citationNumber.x!,
-    y: POSITION_1_ADI_COORDINATES.citationNumber.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 287,
+    y: 371,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   certn: {
-    x: POSITION_1_ADI_COORDINATES.certn.x!,
-    y: POSITION_1_ADI_COORDINATES.certn.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 437,
+    y: 381,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
   },
 
   licenseNumber: {
-    x: POSITION_1_ADI_COORDINATES.licenseNumber.x!,
-    y: POSITION_1_ADI_COORDINATES.licenseNumber.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 383,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   licenseNumber2: {
-    x: POSITION_1_ADI_COORDINATES.licenseNumber2.x!,
-    y: POSITION_1_ADI_COORDINATES.licenseNumber2.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 467,
+    y: 478,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   courseDate: {
-    x: POSITION_1_ADI_COORDINATES.courseDate.x!,
-    y: POSITION_1_ADI_COORDINATES.courseDate.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 395,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   firstName: {
-    x: POSITION_1_ADI_COORDINATES.firstName.x!,
-    y: POSITION_1_ADI_COORDINATES.firstName.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 407,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
   },
 
   lastName: {
-    x: POSITION_1_ADI_COORDINATES.lastName.x!,
-    y: POSITION_1_ADI_COORDINATES.lastName.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 290,
+    y: 407,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
   },
 
   address: {
-    x: POSITION_1_ADI_COORDINATES.address.x!,
-    y: POSITION_1_ADI_COORDINATES.address.y! + POSITION_2_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 422,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
@@ -209,8 +209,8 @@ export const POSITION_2_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Instructor Signature
   instructorSignature: {
-    x: POSITION_1_ADI_COORDINATES.instructorSignature.x!,
-    y: POSITION_1_ADI_COORDINATES.instructorSignature.y! + POSITION_2_OFFSET,
+    x: 116,
+    y: 470,
     fontSize: 7,
     fontFamily: 'Montserrat',
     align: 'center',
@@ -224,71 +224,71 @@ export const POSITION_2_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
  */
 export const POSITION_3_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
   citationNumber: {
-    x: POSITION_1_ADI_COORDINATES.citationNumber.x!,
-    y: POSITION_1_ADI_COORDINATES.citationNumber.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 295,
+    y: 639,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   certn: {
-    x: POSITION_1_ADI_COORDINATES.certn.x!,
-    y: POSITION_1_ADI_COORDINATES.certn.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 439,
+    y: 647,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 100
   },
 
   licenseNumber: {
-    x: POSITION_1_ADI_COORDINATES.licenseNumber.x!,
-    y: POSITION_1_ADI_COORDINATES.licenseNumber.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 650,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   licenseNumber2: {
-    x: POSITION_1_ADI_COORDINATES.licenseNumber2.x!,
-    y: POSITION_1_ADI_COORDINATES.licenseNumber2.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 470,
+    y: 747,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 200
   },
 
   courseDate: {
-    x: POSITION_1_ADI_COORDINATES.courseDate.x!,
-    y: POSITION_1_ADI_COORDINATES.courseDate.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 662,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center'
   },
 
   firstName: {
-    x: POSITION_1_ADI_COORDINATES.firstName.x!,
-    y: POSITION_1_ADI_COORDINATES.firstName.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 676,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'right',
     maxWidth: 120
   },
 
   lastName: {
-    x: POSITION_1_ADI_COORDINATES.lastName.x!,
-    y: POSITION_1_ADI_COORDINATES.lastName.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 290,
+    y: 676,
+    fontSize: 9,
     fontFamily: 'Montserrat',
     align: 'left',
     maxWidth: 150
   },
 
   address: {
-    x: POSITION_1_ADI_COORDINATES.address.x!,
-    y: POSITION_1_ADI_COORDINATES.address.y! + POSITION_3_OFFSET,
-    fontSize: 7,
+    x: 285,
+    y: 688,
+    fontSize: 8,
     fontFamily: 'Montserrat',
     align: 'center',
     maxWidth: 300
@@ -296,8 +296,8 @@ export const POSITION_3_ADI_COORDINATES: Record<string, FieldAdiCoordinate> = {
 
   // Instructor Signature
   instructorSignature: {
-    x: POSITION_1_ADI_COORDINATES.instructorSignature.x!,
-    y: POSITION_1_ADI_COORDINATES.instructorSignature.y! + POSITION_3_OFFSET+5,
+    x: 116,
+    y: 743,
     fontSize: 7,
     fontFamily: 'Montserrat',
     align: 'center',

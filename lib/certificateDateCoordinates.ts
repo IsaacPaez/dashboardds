@@ -25,22 +25,22 @@ export function getDatePositionCoordinates(
 
   switch (position) {
     case 1:
-      baseY = 118; // Top
+      baseY = 110; // Top
       certificateNumberY = 149;
-      birthDateY = 134; // Más abajo y a la derecha
+      birthDateY = 126; // Más abajo y a la derecha
       courseDateY = 210; // Más abajo y a la izquierda
       break;
     case 2:
-      baseY = 398; // Middle
+      baseY = 382; // Middle
       certificateNumberY = 427;
-      birthDateY = 415; // Más abajo y a la derecha
-      courseDateY = 490; // Más abajo y a la izquierda
+      birthDateY = 397; // Más abajo y a la derecha
+      courseDateY = 480; // Más abajo y a la izquierda
       break;
     case 3:
-      baseY = 672; // Bottom
+      baseY = 648; // Bottom
       certificateNumberY = 704;
-      birthDateY = 687; // Más abajo y a la derecha
-      courseDateY = 765; // Más abajo y a la izquierda
+      birthDateY = 663; // Más abajo y a la derecha
+      courseDateY = 744; // Más abajo y a la izquierda
       break;
     default:
       baseY = 119;

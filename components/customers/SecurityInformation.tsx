@@ -18,13 +18,13 @@ export default function SecurityInformation({ form }: { form: any }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-700 font-medium">
-                Password
+                Password (Optional)
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="password"
-                  placeholder="Enter password"
+                  placeholder="Enter password (optional)"
                   className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                 />
               </FormControl>

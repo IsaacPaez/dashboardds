@@ -20,12 +20,8 @@ const formSchema = z
     firstName: z.string().min(2, "First name is required"),
     lastName: z.string().min(2, "Last name is required"),
     middleName: z.string().optional().or(z.literal("")),
-    email: z.string().email("Invalid email"),
-    password: z
-      .string()
-      .min(4, "Password must be at least 4 characters")
-      .optional()
-      .or(z.literal("")),
+    email: z.string().email("Invalid email").optional().or(z.literal("")),
+    password: z.string().optional().or(z.literal("")),
     ssnLast4: z.string().optional(),
     hasLicense: z.boolean(),
     licenseNumber: z.string().optional().or(z.literal("")),
@@ -36,6 +32,7 @@ const formSchema = z
     state: z.string().optional().or(z.literal("")),
     zipCode: z.string().optional().or(z.literal("")),
     phoneNumber: z.string().min(1, "Phone number is required"),
+    phoneNumber2: z.string().optional().or(z.literal("")),
     sex: z.string(),
     registerForCourse: z.boolean().default(false),
     payedAmount: z.number().min(0, "Amount must be greater than 0").optional(),
@@ -186,6 +183,7 @@ interface CustomersFormProps {
     state: string;
     zipCode: string;
     phoneNumber: string;
+    phoneNumber2?: string;
     sex: string;
     howDidYouHear: string;
     payedAmount: number;
@@ -247,6 +245,7 @@ const CustomersForm = ({ initialData }: CustomersFormProps) => {
       state: initialData?.state || "",
       zipCode: initialData?.zipCode || "",
       phoneNumber: initialData?.phoneNumber || "",
+      phoneNumber2: initialData?.phoneNumber2 || "",
       sex: initialData?.sex || "",
       payedAmount: 0,
       method: "",

@@ -40,16 +40,37 @@ export default function ContactInfromation({
         />
         <FormField
           control={form.control}
+          name="phoneNumber2"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 font-medium">
+                Phone Number 2 (Optional)
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Enter second phone number"
+                  type="tel"
+                  className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
+              <FormLabel className="text-gray-700 font-medium">
+                Email (Optional)
+              </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="email"
                   placeholder="Enter email"
-                  readOnly={initialData ? true : false}
                   className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                 />
               </FormControl>

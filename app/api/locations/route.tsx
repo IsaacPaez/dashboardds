@@ -10,7 +10,7 @@ export const POST = async (req: NextRequest) => {
     await connectToDB();
 
     const requestData = await req.json();
-    const { title, description, zone, locationImage, instructors } = requestData;
+    const { title, zone, locationImage, instructors, content } = requestData;
 
     if (!title || !zone) {
       return new NextResponse("Title and zone are required", { status: 400 });
@@ -19,10 +19,10 @@ export const POST = async (req: NextRequest) => {
     // Crear el documento en MongoDB
     const newLocation = await Location.create({
       title,
-      description,
       zone,
       locationImage,
       instructors,
+      content: content || "",
     });
 
     await newLocation.save();

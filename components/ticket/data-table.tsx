@@ -429,7 +429,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {
@@ -447,7 +448,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {
@@ -465,7 +467,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {
@@ -483,7 +486,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {
@@ -501,7 +505,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {
@@ -519,7 +524,8 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
             const pages = await combinedPdf.copyPages(pdf, pdf.getPageIndices());
             pages.forEach((page) => combinedPdf.addPage(page));
           }
-          pdfBlob = new Blob([await combinedPdf.save()], { type: 'application/pdf' });
+          const pdfBytes = await combinedPdf.save();
+          pdfBlob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         } else if (Array.isArray(result) && result[0]) {
           pdfBlob = result[0];
         } else if (!Array.isArray(result)) {

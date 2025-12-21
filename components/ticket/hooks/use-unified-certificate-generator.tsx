@@ -104,7 +104,7 @@ export function useUnifiedCertificateGenerator() {
       const pdfBytes = await pdfDoc.save();
 
       // Create blob
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
 
 
       return blob;

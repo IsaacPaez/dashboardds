@@ -466,7 +466,7 @@ export default function DrivingLessonCertificatesPage() {
             pages.forEach((page) => combinedPdf.addPage(page));
           }
           const finalBytes = await combinedPdf.save();
-          const finalBlob = new Blob([finalBytes as any], { type: "application/pdf" });
+          const finalBlob = new Blob([new Uint8Array(finalBytes)], { type: "application/pdf" });
           
           // Download
           const url = URL.createObjectURL(finalBlob);

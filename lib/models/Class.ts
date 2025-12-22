@@ -2,10 +2,11 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IDrivingClass extends Document {
   title: string;
-  alsoKnownAs: string[];
+  alsoKnownAs?: string[]; // Deprecated
   length: number;
   price: number;
-  overview: string;
+  overview?: string; // Deprecated
+  description?: string; // New combined field with HTML content
   objectives: string[];
   buttonLabel: string;
   image?: string;
@@ -18,10 +19,11 @@ export interface IDrivingClass extends Document {
 
 const DrivingClassSchema: Schema = new Schema({
   title: { type: String, required: true, unique: true },
-  alsoKnownAs: { type: [String], default: [] },
+  alsoKnownAs: { type: [String], default: [] }, // Deprecated
   length: { type: Number, required: true, min: 0.1 },
   price: { type: Number, required: true, min: 0 },
-  overview: { type: String, required: true },
+  overview: { type: String }, // Deprecated - no longer required
+  description: { type: String }, // New combined field with HTML content
   objectives: { type: [String], default: [] },
   buttonLabel: { type: String, required: true },
   image: { type: String, default: "" },

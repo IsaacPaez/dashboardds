@@ -257,7 +257,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
       // Log specific fields you're changing
 
       // Validate required fields before sending
-      if (!currentValues.title || !currentValues.overview || !currentValues.buttonLabel) {
+      if (!currentValues.title || !currentValues.description || !currentValues.buttonLabel) {
         toast.error("Please fill in all required fields");
         return;
       }
@@ -610,8 +610,8 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
             )}
           />
 
-          {/* 🔹 OBJECTIVES */}
-          <FormItem>
+          {/* 🔹 OBJECTIVES - COMMENTED OUT FOR NOW (can be re-enabled if needed) */}
+          {/* <FormItem>
             <FormLabel className="pr-4">Objectives</FormLabel>
             {form.watch("objectives").map((objective, index) => (
               <div key={index} className="flex items-center gap-2">
@@ -643,7 +643,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
             >
               + Add Objective
             </Button>
-          </FormItem>
+          </FormItem> */}
 
 
 

@@ -22,14 +22,11 @@ import {
   AlignCenter,
   AlignRight,
   Link as LinkIcon,
-  Image as ImageIcon,
   Undo,
   Redo,
   Palette,
   Type,
-  Square,
   AlignJustify,
-  Youtube as YoutubeIcon,
   Upload,
   MousePointerClick,
 } from "lucide-react";
@@ -44,10 +41,6 @@ interface CloudinaryUploadResult {
   };
 }
 
-interface WindowWithImageData extends Window {
-  pendingImageUrl?: string;
-  clickedImage?: HTMLElement;
-}
 
 interface TipTapEditorProps {
   content: string;
@@ -314,6 +307,8 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
       handleContainer.style.boxSizing = 'border-box';
       handleContainer.style.borderRadius = '4px';
 
+      if (!handleContainer) return;
+
       // Create 8 handles (4 corners + 4 edges)
       const handles = [
         { pos: 'nw', cursor: 'nwse-resize', top: '-10px', left: '-10px' },
@@ -378,7 +373,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
           }
         });
 
-        handleContainer.appendChild(handle);
+        handleContainer!.appendChild(handle);
       });
 
       // Append to body for fixed positioning
@@ -424,7 +419,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
         
         // Small delay to ensure image is rendered
         setTimeout(() => {
-          createHandles(selectedImage);
+          createHandles(selectedImage!);
         }, 10);
         
         return false;
@@ -522,7 +517,7 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
         try {
           // This approach is more reliable to find the position
           const view = editor.view;
-          const pos = view.posAtDOM(selectedImage);
+          const pos = view.posAtDOM(selectedImage, 0);
           
           if (typeof pos === 'number') {
             const { width, height } = selectedImage.style;
@@ -692,10 +687,6 @@ const TipTapEditor: React.FC<TipTapEditorProps> = ({
   };
 
 
-  const addImageByUrl = () => {
-    setImageUrl("");
-    setShowImageUrlModal(true);
-  };
 
   const confirmImageUrl = () => {
     if (imageUrl) {

@@ -15,8 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "../ui/textarea";
 import ImageUpload from "../custom ui/ImageUpload";
+import TipTapEditor from "../custom ui/TipTapEditor";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import Select, { MultiValue, ActionMeta } from "react-select";
@@ -25,10 +25,11 @@ import Link from "next/link";
 
 const formSchema = z.object({
   title: z.string().min(2).max(500),
-  alsoKnownAs: z.array(z.string().min(1)).default([]),
+  alsoKnownAs: z.string().max(50000).default("").optional(), // Deprecated
   length: z.coerce.number().min(0.1, "Must be at least 0.1 hours"),
   price: z.coerce.number().min(0.1, "Price must be greater than 0"),
-  overview: z.string().min(10).max(2000),
+  overview: z.string().max(50000).optional(), // Deprecated
+  description: z.string().min(10).max(50000), // New combined field
   objectives: z.array(z.string().min(1)).default([]),
   buttonLabel: z.string().min(1).max(20),
   image: z.string().optional(),
@@ -40,10 +41,11 @@ interface FormProps {
   initialData?: {
     _id: string;
     title: string;
-    alsoKnownAs: string[];
+    alsoKnownAs: string; // Deprecated
     length: number;
     price: number;
-    overview: string;
+    overview: string; // Deprecated
+    description: string; // New combined field
     objectives: string[];
     buttonLabel: string;
     image?: string;
@@ -99,11 +101,11 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
 
   // ✅ Función para manejar selección en el dropdown
   const handleSelectChange = (newValue: MultiValue<{ label: string; value: string }>, actionMeta: ActionMeta<{ label: string; value: string }>) => {
-      const selectedValues = newValue.map((hq) => hq.value);
+    const selectedValues = newValue.map((hq) => hq.value);
 
-      form.setValue("headquarters", selectedValues);
-      setSelectedHeadquarters(newValue as { label: string; value: string }[]);
-    };
+    form.setValue("headquarters", selectedValues);
+    setSelectedHeadquarters(newValue as { label: string; value: string }[]);
+  };
 
   // ✅ Función para manejar "Seleccionar Todos"
   const handleSelectAll = () => {
@@ -158,14 +160,15 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData?.title || "",
-      alsoKnownAs: initialData?.alsoKnownAs ?? [],
+      alsoKnownAs: initialData?.alsoKnownAs || "", // Deprecated  
       length: initialData?.length ?? 1,
       price: initialData?.price ?? 0.1,
-      overview: initialData?.overview || "",
+      overview: initialData?.overview || "", // Deprecated
+      description: initialData?.description || "", // New combined field
       objectives: initialData?.objectives ?? [],
       buttonLabel: initialData?.buttonLabel || "",
       image: initialData?.image || "",
-      headquarters: initialData?.headquarters ?? [], // ✅ Asegura que sea un array
+      headquarters: initialData?.headquarters ?? [],
       classType: initialData?.classType ?? "date",
     },
   });
@@ -174,8 +177,8 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
   useEffect(() => {
     if (initialData?.headquarters && headquartersOptions.length > 0) {
       const selected = headquartersOptions.filter(hq =>
-         initialData.headquarters?.includes(hq.value)
-        );
+        initialData.headquarters?.includes(hq.value)
+      );
       setSelectedHeadquarters(selected);
       form.setValue("headquarters", selected.map(hq => hq.value)); // ✅ Sincroniza el formulario
     }
@@ -205,10 +208,11 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
     if (initialData && !originalData) {
       setOriginalData({
         title: initialData.title || "",
-        alsoKnownAs: initialData.alsoKnownAs || [],
+        alsoKnownAs: initialData.alsoKnownAs || "", // Deprecated
         length: initialData.length || 1,
         price: initialData.price || 0.1,
-        overview: initialData.overview || "",
+        overview: initialData.overview || "", // Deprecated
+        description: initialData.description || "", // New combined field
         objectives: initialData.objectives || [],
         buttonLabel: initialData.buttonLabel || "",
         image: initialData.image || "",
@@ -294,12 +298,12 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
           toast.error("Invalid response from server");
           return;
         }
-        
+
         if (updatedData.success) {
 
           toast.success("Class updated successfully!");
           setHasChanges(false);
-          
+
           // Actualizar originalData con los datos del servidor
           setOriginalData({
             ...updatedData.data,
@@ -320,7 +324,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
           const errorData = await res.json();
           console.error("[SAVE_DEBUG] Error response:", errorData);
           errorMessage = errorData.message || errorMessage;
-          
+
           if (errorData.errors && Array.isArray(errorData.errors)) {
             errorMessage = errorData.errors.join(", ");
           }
@@ -372,7 +376,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
           toast.error("Invalid response from server");
           return;
         }
-        
+
         if (responseData.success !== false) {
           toast.success(`Class ${initialData ? "updated" : "created"} successfully`);
           router.push("/classes");
@@ -386,7 +390,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
           const errorData = await res.json();
           console.error("[DEBUG] Error response:", errorData);
           errorMessage = errorData.message || errorMessage;
-          
+
           if (errorData.errors && Array.isArray(errorData.errors)) {
             errorMessage = errorData.errors.join(", ");
           }
@@ -403,7 +407,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
       setIsLoading(false);
     }
   };
-  
+
 
   return (
     <div className="p-10 mx-auto bg-white rounded-lg shadow-md">
@@ -525,40 +529,31 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
             )}
           />
 
-          {/* 🔹 ALSO KNOWN AS */}
-          <FormItem>
-            <FormLabel className="pr-4">Also known as</FormLabel>
-            {form.watch("alsoKnownAs").map((alias, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  value={alias}
-                  onChange={(e) => {
-                    const newAliases = [...form.getValues("alsoKnownAs")];
-                    newAliases[index] = e.target.value;
-                    form.setValue("alsoKnownAs", newAliases);
-                  }}
-                  placeholder="Enter alias"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => {
-                    const newAliases = form.getValues("alsoKnownAs").filter((_, i) => i !== index);
-                    form.setValue("alsoKnownAs", newAliases);
-                  }}
-                >
-                  ✕
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => form.setValue("alsoKnownAs", [...form.getValues("alsoKnownAs"), ""])}
-              className="mt-2 bg-blue-500 text-white"
-            >
-              + Add Also Know As
-            </Button>
-          </FormItem>
+
+          {/* 🔹 DESCRIPTION (replaces Also Known As + Overview) */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-bold text-gray-900">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <TipTapEditor
+                    content={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder="Add class description with rich content (text, images, links, buttons, etc.)"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Hidden deprecated fields - DO NOT DELETE (kept for backward compatibility) */}
+          <input type="hidden" {...form.register("alsoKnownAs")} />
+          <input type="hidden" {...form.register("overview")} />
 
           {/* 🔹 HEADQUARTERS */}
           <FormItem>
@@ -615,20 +610,6 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
             )}
           />
 
-          {/* 🔹 OVERVIEW */}
-          <FormField
-            control={form.control}
-            name="overview"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Overview</FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder="Enter overview" rows={4} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           {/* 🔹 OBJECTIVES */}
           <FormItem>
             <FormLabel className="pr-4">Objectives</FormLabel>
@@ -700,29 +681,29 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
             )}
           />
 
-      {/* 🔹 BUTTONS */}
-      <div className="flex gap-4">
-        {/* Botón Save solo para edición */}
-        {initialData && (
-          <Button
-            type="button"
-            onClick={handleSave}
-            className={`${hasChanges ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'} text-white transition-colors`}
-            disabled={isLoading || !hasChanges}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Saving...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                💾 Save Changes
-                {hasChanges && <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>}
-              </div>
-            )}
-          </Button>
-        )}            {/* Botón Submit original para creación */}
+          {/* 🔹 BUTTONS */}
+          <div className="flex gap-4">
+            {/* Botón Save solo para edición */}
+            {initialData && (
+              <Button
+                type="button"
+                onClick={handleSave}
+                className={`${hasChanges ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'} text-white transition-colors`}
+                disabled={isLoading || !hasChanges}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Saving...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    💾 Save Changes
+                    {hasChanges && <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>}
+                  </div>
+                )}
+              </Button>
+            )}            {/* Botón Submit original para creación */}
             {!initialData && (
               <Button
                 type="submit"

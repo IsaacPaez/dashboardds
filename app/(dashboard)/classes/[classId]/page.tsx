@@ -9,10 +9,11 @@ import CustomForm from "@/components/classes/ClassesForm";
 type DrivingClassType = {
   _id: string;
   title: string;
-  alsoKnownAs: string[];
+  alsoKnownAs: string; // Deprecated - use description
   length: number;
   price: number;
-  overview: string;
+  overview: string; // Deprecated - use description
+  description: string; // Rich HTML content combining alsoKnownAs + overview
   objectives: string[];
   contact: string;
   buttonLabel: string;

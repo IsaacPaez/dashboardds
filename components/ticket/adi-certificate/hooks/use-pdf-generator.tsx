@@ -387,7 +387,9 @@ export function usePdfGenerator() {
 
     // Convert the PDF to bytes and create a blob
     const pdfBytes = await pdfDoc.save();
-    return new Blob([pdfBytes], { type: "application/pdf" });
+    // Create a new Uint8Array copy to ensure proper type compatibility with Blob
+    const bytes = new Uint8Array(pdfBytes);
+    return new Blob([bytes], { type: "application/pdf" });
   }, []);
 
   return { generatePDF };

@@ -152,7 +152,7 @@ export function useBdiCertificateGenerator() {
 
         // Generar el PDF
         const pdfBytes = await pdfDoc.save();
-        return new Blob([pdfBytes as any], { type: "application/pdf" });
+        return new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
       } catch (error) {
         console.error("❌ Error generating BDI certificate:", error);
         throw error;
@@ -345,7 +345,7 @@ export function useBdiCertificateGenerator() {
 
           // Generar el PDF para este grupo
           const pdfBytes = await pdfDoc.save();
-          pdfs.push(new Blob([pdfBytes as any], { type: "application/pdf" }));
+          pdfs.push(new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" }));
         }
 
 

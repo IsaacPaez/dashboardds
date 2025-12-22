@@ -47,15 +47,21 @@ export async function PATCH(req: NextRequest) {
 
     // ✅ Obtener los datos del request
     const body = await req.json();
-    const { instructors, ...updateData } = body;
+    const { instructors, content, ...updateData } = body;
 
     // ✅ Asegurar que los instructores sean `ObjectId[]`
-    const instructorsObjectIds = instructors.map((id: string) => new mongoose.Types.ObjectId(id));
+    const instructorsObjectIds = instructors?.map((id: string) => new mongoose.Types.ObjectId(id)) || [];
+
+    // ✅ Preparar datos de actualización incluyendo content
+    const updateFields: any = { ...updateData, instructors: instructorsObjectIds };
+    if (content !== undefined) {
+      updateFields.content = content;
+    }
 
     // ✅ Actualizar la ubicación en la base de datos
     const updatedLocation = await Locations.findByIdAndUpdate(
       locationId,
-      { ...updateData, instructors: instructorsObjectIds },
+      updateFields,
       { new: true }
     ).populate("instructors"); // ✅ Populamos instructores después de actualizar
 

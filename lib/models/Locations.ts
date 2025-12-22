@@ -6,6 +6,7 @@ export interface ILocation extends Document {
   zone: string;
   locationImage?: string;
   instructors: Schema.Types.ObjectId[];
+  content?: string; // Contenido rico en HTML generado por TipTap
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -32,6 +33,10 @@ const LocationSchema: Schema = new Schema({
       ref: "Instructor",
     },
   ],
+  content: {
+    type: String,
+    default: "",
+  },
 }, { timestamps: true });
 
 const Location: Model<ILocation> = mongoose.models.Location || mongoose.model<ILocation>("Location", LocationSchema);

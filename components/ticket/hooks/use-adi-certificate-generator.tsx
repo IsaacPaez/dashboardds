@@ -147,7 +147,7 @@ export function useAdiCertificateGenerator() {
         }
 
         const pdfBytes = await pdfDoc.save();
-        return new Blob([pdfBytes as any], { type: "application/pdf" });
+        return new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
       } catch (error) {
         console.error("❌ Error generating single ADI certificate:", error);
         throw error;
@@ -335,7 +335,7 @@ export function useAdiCertificateGenerator() {
           }
 
           const pdfBytes = await pdfDoc.save();
-          pdfs.push(new Blob([pdfBytes as any], { type: "application/pdf" }));
+          pdfs.push(new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" }));
         }
 
         // Si solo hay 1 PDF, retornarlo directamente

@@ -16,8 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "../ui/textarea";
 import ImageUpload from "../custom ui/ImageUpload";
+import TipTapEditor from "../custom ui/TipTapEditor";
 import toast from "react-hot-toast";
 import Select from "react-select"; // 📌 Librería para Select
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
@@ -29,10 +29,10 @@ const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 const formSchema = z.object({
   title: z.string().optional(),
-  description: z.string().optional(),
   zone: z.string().optional(),
   locationImage: z.string().optional(),
   instructors: z.array(z.string()).default([]), // 📌 Array de IDs de instructores
+  content: z.string().optional(), // Contenido rico en HTML
 });
 
 // Definir el tipo correcto
@@ -44,10 +44,10 @@ interface Instructor {
 interface LocationType {
   _id?: string;
   title: string;
-  description: string;
   zone: string;
   locationImage?: string;
   instructors: string[]; // Solo guardamos los IDs
+  content?: string; // Contenido rico en HTML
 }
 
 interface LocationsFormProps {
@@ -65,10 +65,10 @@ const LocationsForm: React.FC<LocationsFormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData?.title || "",
-      description: initialData?.description || "",
       zone: initialData?.zone || "",
       locationImage: initialData?.locationImage || "",
       instructors: initialData?.instructors || [],
+      content: initialData?.content || "",
     },
   });
 
@@ -203,25 +203,6 @@ const LocationsForm: React.FC<LocationsFormProps> = ({ initialData }) => {
             )}
           />
 
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Enter description"
-                    rows={4}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Zone */}
           <FormField
             control={form.control}
@@ -301,6 +282,27 @@ const LocationsForm: React.FC<LocationsFormProps> = ({ initialData }) => {
             />
             <label className="text-gray-700">Select All Instructors</label>
           </div>
+
+          {/* Rich Content Editor */}
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-bold text-gray-900">
+                  Location Content
+                </FormLabel>
+                <FormControl>
+                  <TipTapEditor
+                    content={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder="Add custom content for this location (text, images, links, etc.)"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Submit Button */}
           <div className="flex gap-4">

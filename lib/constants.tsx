@@ -8,7 +8,8 @@ import {
     CalendarDays,
     MapPinCheck,
     Search, // ✅ Importamos el icono de búsqueda
-    Ticket
+    Ticket,
+    FolderOpen
   } from "lucide-react";
   
   export const navLinks = [
@@ -71,6 +72,11 @@ import {
       url: "/seo",  // ✅ Agregamos la URL para la sección de SEO
       icon: <Search />,  // ✅ Usamos un icono de búsqueda para representar SEO
       label: "SEO",
+    },
+    {
+      url: "/resources",
+      icon: <FolderOpen />,
+      label: "Resources",
     }
 
   ];

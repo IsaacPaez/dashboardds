@@ -47,9 +47,16 @@ export const columns: ColumnDef<ProductType>[] = [
       ),
   },
   {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }) => <p className="font-medium text-gray-600">{row.original.category || "N/A"}</p>,
+    accessorKey: "tag",
+    header: "Tag",
+    cell: ({ row }) =>
+      row.original.tag && row.original.tag.trim() !== "" ? (
+        <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full uppercase">
+          {row.original.tag}
+        </span>
+      ) : (
+        <p className="text-gray-400 italic text-sm">No tag</p>
+      ),
   },
   {
     accessorKey: "type",

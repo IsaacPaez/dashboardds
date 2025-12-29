@@ -6,7 +6,7 @@ export interface IProduct extends Document {
   media: string[];
   price: number;
   duration: number;
-  category: "General" | "Road Skills for Life";
+  tag?: string;
   type: "Book" | "Buy" | "Contact";
   buttonLabel: string;
   createdAt?: Date;
@@ -19,7 +19,7 @@ const ProductSchema: Schema = new Schema({
   media: { type: [String], default: [] },
   price: { type: Number, required: true, min: 0.1 },
   duration: { type: Number, required: true, min: 1, validate: { validator: Number.isInteger, message: 'Duration must be a whole number' } },
-  category: { type: String, enum: ["General", "Road Skills for Life"], required: true },
+  tag: { type: String, default: "", trim: true, maxlength: 50 },
   type: { type: String, enum: ["Book", "Buy", "Contact"], required: true },
   buttonLabel: { type: String, required: true },
 }, { timestamps: true });

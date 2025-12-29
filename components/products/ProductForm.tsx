@@ -21,7 +21,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import Delete from "../custom ui/Delete";
 import Loader from "../custom ui/Loader";
-import { Combobox } from "@/components/ui/combobox";
 import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
@@ -31,7 +30,7 @@ const formSchema = z.object({
   media: z.array(z.string()).default([]),
   price: z.coerce.number().min(0.1, "Price must be at least $0.10"),
   duration: z.coerce.number().int("Duration must be a whole number").min(1, "Duration must be at least 1 hour").max(24, "Duration cannot exceed 24 hours"),
-  category: z.enum(["General", "Road Skills for Life"]),
+  tag: z.string().max(50, "Tag cannot exceed 50 characters").optional(),
   type: z.literal("Buy"), // Always "Buy" for products
   buttonLabel: z.string().min(1, "Button label is required").max(20),
 });
@@ -44,7 +43,7 @@ interface ProductFormProps {
     media: string[];
     price: number;
     duration: number;
-    category: "General" | "Road Skills for Life";
+    tag?: string;
     buttonLabel: string;
   } | null;
 }
@@ -62,7 +61,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
       media: initialData?.media || [],
       price: initialData?.price ?? 0.1, // Usa `??` para evitar undefined
       duration: initialData?.duration ?? 1,
-      category: initialData?.category || "General",
+      tag: initialData?.tag || "",
       type: "Buy",
       buttonLabel: initialData?.buttonLabel || "",
     },
@@ -180,7 +179,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             />
           )}
 
-          {/* 🔹 PRICE, DURATION y CATEGORY en una FILA */}
+          {/* 🔹 PRICE, DURATION y TAG en una FILA */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
               control={form.control}
@@ -212,18 +211,16 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
 
             <FormField
               control={form.control}
-              name="category"
+              name="tag"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category *</FormLabel>
+                  <FormLabel>Tag (Optional)</FormLabel>
                   <FormControl>
-                    <Combobox
-                      options={[
-                        { label: "General", value: "General" },
-                        { label: "Road Skills for Life", value: "Road Skills for Life" },
-                      ]}
-                      value={field.value}
-                      onChange={field.onChange}
+                    <Input
+                      placeholder="e.g., OFERTAS, NEW, POPULAR"
+                      {...field}
+                      maxLength={50}
+                      className="border-gray-300 rounded-md shadow-sm"
                     />
                   </FormControl>
                   <FormMessage />

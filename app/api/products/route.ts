@@ -20,12 +20,12 @@ export const POST = async (req: NextRequest) => {
       media,
       price,
       duration,
-      category,
+      tag,
       buttonLabel,
     } = await req.json();
 
-    if (!title || !description || !price || !duration || !category || !buttonLabel) {
-      return new NextResponse("Title, description, price, duration, category, and buttonLabel are required", { status: 400 });
+    if (!title || !description || !price || !duration || !buttonLabel) {
+      return new NextResponse("Title, description, price, duration, and buttonLabel are required", { status: 400 });
     }
 
     // 🔹 Si `hasImage` es `false`, asegúrate de que `media` esté vacío
@@ -38,7 +38,7 @@ export const POST = async (req: NextRequest) => {
       media: processedMedia,
       price,
       duration,
-      category,
+      tag: tag || "", // Tag opcional
       type: "Buy", // Always "Buy" for products
       buttonLabel,
     });

@@ -14,7 +14,7 @@ type ProductType = {
   media: string[]; // 🔹 Ahora soporta múltiples imágenes
   price: number;
   duration: number; // 🔹 Duración en horas
-  category: "General" | "Road Skills for Life"; // 🔹 Usamos enum para consistencia
+  tag?: string; // 🔹 Etiqueta decorativa opcional (max 50 chars)
   type: "Book" | "Buy" | "Contact"; // 🔹 Nuevo campo de tipo de producto
   buttonLabel: string; // 🔹 Texto personalizado para el botón
   createdAt: Date;

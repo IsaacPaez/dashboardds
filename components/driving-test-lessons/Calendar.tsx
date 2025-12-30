@@ -355,7 +355,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
     const startTime = new Date(event.start);
     const endTime = new Date(event.end);
     const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-    const isShortEvent = durationMinutes <= 30;
+    const isShortEvent = durationMinutes <= 30; // 15 y 30 minutos usan layout compacto
     
     return (
       <div className="w-full h-full flex flex-col justify-center" data-event-id={event.id} data-status={status}>
@@ -423,36 +423,47 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
       <style jsx global>{`
         /* Estilos principales para eventos */
         .fc .fc-timegrid-event .fc-event-main {
-          padding: 4px 6px !important;
-          font-size: 12px !important;
-          line-height: 1.3 !important;
+          padding: 6px 8px !important;
+          font-size: 13px !important;
+          line-height: 1.4 !important;
           white-space: normal !important;
           overflow: visible !important;
           word-wrap: break-word !important;
           height: auto !important;
         }
-        
+
         .fc .fc-timegrid-event {
-          min-height: 25px !important;
+          min-height: 35px !important;
           max-height: none !important;
-          border-radius: 4px !important;
+          border-radius: 6px !important;
           overflow: visible !important;
         }
-        
+
         .fc .fc-timegrid-event-harness {
-          min-height: 25px !important;
+          min-height: 35px !important;
           overflow: visible !important;
         }
-        
+
+        /* Eventos de 15 minutos - altura específica */
+        .fc .fc-timegrid-event[data-duration="15"] {
+          min-height: 25px !important;
+          max-height: 30px !important;
+        }
+
+        .fc .fc-timegrid-event-harness[data-duration="15"] {
+          min-height: 25px !important;
+          max-height: 30px !important;
+        }
+
         /* Eventos de 30 minutos - altura específica */
         .fc .fc-timegrid-event[data-duration="30"] {
-          min-height: 30px !important;
-          max-height: 35px !important;
+          min-height: 40px !important;
+          max-height: 45px !important;
         }
-        
+
         .fc .fc-timegrid-event-harness[data-duration="30"] {
-          min-height: 30px !important;
-          max-height: 35px !important;
+          min-height: 40px !important;
+          max-height: 45px !important;
         }
         
         /* Eventos de 1+ horas - altura normal */
@@ -466,18 +477,18 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
           min-height: 45px !important;
         }
         
-        /* Reducir tamaño de letra para todos los eventos */
-        .fc .fc-timegrid-event .fc-event-main {
-          padding: 4px 6px !important;
-          font-size: 12px !important;
-          line-height: 1.3 !important;
+        /* Texto para eventos de 15 minutos */
+        .fc .fc-timegrid-event[data-duration="15"] .fc-event-main {
+          padding: 2px 4px !important;
+          font-size: 10px !important;
+          line-height: 1.1 !important;
         }
 
         /* Texto para eventos de 30 minutos */
         .fc .fc-timegrid-event[data-duration="30"] .fc-event-main {
-          padding: 3px 5px !important;
-          font-size: 11px !important;
-          line-height: 1.2 !important;
+          padding: 4px 6px !important;
+          font-size: 12px !important;
+          line-height: 1.3 !important;
         }
         
         .fc .fc-event {
@@ -578,7 +589,32 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
           }
         }
-        
+
+        /* Líneas divisorias - horas más marcadas que los 15 minutos */
+        .fc .fc-timegrid-slot {
+          border-color: #e5e7eb !important; /* Líneas de 15 min - gris claro */
+          border-top-width: 1px !important;
+        }
+
+        /* Líneas ARRIBA de cada hora completa (6:00, 7:00, etc.) - MÁS MARCADAS */
+        .fc .fc-timegrid-slot[data-time$=":00:00"] {
+          border-top: 2px solid #9ca3af !important; /* Línea ARRIBA más gruesa y oscura */
+        }
+
+        .fc .fc-timegrid-slot-label {
+          border-color: #d1d5db !important;
+        }
+
+        .fc .fc-timegrid-slot-lane {
+          border-color: #e5e7eb !important; /* Líneas verticales de días */
+        }
+
+        /* Primera línea del calendario */
+        .fc-timegrid-axis {
+          border-top-width: 2px !important;
+          border-top-color: #9ca3af !important;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
           .fc .fc-timegrid-event .fc-event-main {
@@ -628,10 +664,10 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
                 }
               }
             }}
-            height="auto"
+            height="900px"
             slotMinTime="06:00:00"
             slotMaxTime="22:00:00"
-            slotDuration="00:30:00"
+            slotDuration="00:15:00"
             allDaySlot={false}
             eventTimeFormat={{
               hour: "2-digit",

@@ -46,11 +46,30 @@ interface DataTableProps {
 export function DataTable({ columns, data, onUpdate, template }: DataTableProps) {
   const [rowSelection, setRowSelection] = useState({});
 
+  // Column selection state - initialize with all columns selected
+  const [columnSelection, setColumnSelection] = useState<Record<string, boolean>>(() => {
+    const initialSelection: Record<string, boolean> = {};
+    columns.forEach((col) => {
+      if ('accessorKey' in col && col.accessorKey) {
+        initialSelection[col.accessorKey as string] = true;
+      }
+    });
+    return initialSelection;
+  });
+
   // Helper function to get options for a variable
   const getVariableOptions = (columnId: string) => {
     if (!template?.availableVariables) return null;
     const variable = template.availableVariables.find((v: any) => v.key === columnId);
     return variable?.options || null;
+  };
+
+  // Column selection handler
+  const handleColumnToggle = (columnId: string) => {
+    setColumnSelection((prev) => ({
+      ...prev,
+      [columnId]: !prev[columnId],
+    }));
   };
 
   const {
@@ -622,21 +641,43 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
   };
 
   const downloadXLSX = useCallback(() => {
-    const studentsWithCertnZero = data
-      .filter((student) => student.certn === 0)
-      .map(({ ...rest }) => rest);
+    // Get selected rows
+    const selectedRows = table
+      .getSelectedRowModel()
+      .flatRows.map((row) => row.original as Student);
 
-    if (studentsWithCertnZero.length === 0) {
-      toast.error("No hay estudiantes con número de certificado igual a 0 para exportar.");
+    if (selectedRows.length === 0) {
+      toast.error("Por favor seleccione al menos un estudiante para exportar.");
+      return;
+    }
+
+    // Get selected columns
+    const selectedColumnIds = Object.keys(columnSelection).filter(
+      (columnId) => columnSelection[columnId]
+    );
+
+    if (selectedColumnIds.length === 0) {
+      toast.error("Por favor seleccione al menos una columna para exportar.");
       return;
     }
 
     const loadingToast = toast.loading("Generando archivo Excel...");
 
     try {
-      const worksheet = XLSX.utils.json_to_sheet(studentsWithCertnZero);
+      // Filter data to include only selected columns
+      const filteredData = selectedRows.map((student) => {
+        const filteredStudent: any = {};
+        selectedColumnIds.forEach((columnId) => {
+          if (columnId in student) {
+            filteredStudent[columnId] = student[columnId];
+          }
+        });
+        return filteredStudent;
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(filteredData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Estudiantes_Sin_Certificado");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Estudiantes");
 
       const xlsxData = XLSX.write(workbook, {
         bookType: "xlsx",
@@ -646,17 +687,17 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
-      const fileName = `Estudiantes_Sin_Certificado_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const fileName = `Estudiantes_${new Date().toISOString().split('T')[0]}.xlsx`;
       saveAs(blob, fileName);
-      
+
       toast.dismiss(loadingToast);
-      toast.success(`Archivo Excel descargado exitosamente con ${studentsWithCertnZero.length} estudiante(s)`);
+      toast.success(`Archivo Excel descargado exitosamente con ${selectedRows.length} estudiante(s) y ${selectedColumnIds.length} columna(s)`);
     } catch (error) {
       console.error("Error generating XLSX:", error);
       toast.dismiss(loadingToast);
       toast.error("Error al generar el archivo Excel. Intente nuevamente.");
     }
-  }, [data]);
+  }, [table, columnSelection]);
 
 
 
@@ -675,16 +716,33 @@ export function DataTable({ columns, data, onUpdate, template }: DataTableProps)
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const columnId = header.column.id;
+                  const isSelectColumn = columnId === 'select';
+                  const hasAccessorKey = 'accessorKey' in header.column.columnDef;
+
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div className="flex items-center gap-2">
+                          {!isSelectColumn && hasAccessorKey && (
+                            <input
+                              type="checkbox"
+                              checked={columnSelection[columnId] || false}
+                              onChange={() => handleColumnToggle(columnId)}
+                              className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                              title="Include in XLSX export"
+                            />
+                          )}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </div>
+                      )}
+                    </TableHead>
+                  );
+                })}
                 <TableHead className="sticky right-0 bg-white z-10 shadow-left">Actions</TableHead>
               </TableRow>
             ))}

@@ -6,6 +6,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import ScheduleModal from "./ScheduleModal";
 import Loader from "@/components/custom ui/Loader";
+import EventCardContent from "./EventCardContent";
 
 interface CalendarProps {
   selectedInstructor?: any;
@@ -344,54 +345,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
   };
 
   const renderEventContent = (eventInfo: any) => {
-    const event = eventInfo.event;
-    const extendedProps = event.extendedProps;
-    
-    // Formatear el título con líneas separadas para mejor legibilidad
-    const classType = extendedProps?.classType === 'driving test' ? 'Test' : 'Lesson';
-    const status = extendedProps?.status || 'available';
-    
-    // Calcular duración del evento para optimizar display
-    const startTime = new Date(event.start);
-    const endTime = new Date(event.end);
-    const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-    const isShortEvent = durationMinutes <= 30; // 15 y 30 minutos usan layout compacto
-    
-    return (
-      <div className="w-full h-full flex flex-col justify-center" data-event-id={event.id} data-status={status}>
-        {isShortEvent ? (
-          // Layout optimizado para eventos de 30 minutos - solo tipo y status
-          <>
-            <div className="font-bold leading-tight text-center">
-              {classType}
-            </div>
-            <div className="font-medium capitalize text-center">
-              {status}
-            </div>
-          </>
-        ) : (
-          // Layout normal para eventos más largos
-          <>
-            <div className="font-medium leading-tight">
-              {classType}
-            </div>
-            <div className="opacity-90 capitalize">
-              {status}
-            </div>
-            {(status === 'booked' || status === 'pending') && extendedProps?.studentName && (
-              <div className="mt-1 leading-tight">
-                {extendedProps.studentName}
-              </div>
-            )}
-            {extendedProps?.classType === 'driving test' && extendedProps?.amount && (
-              <div className="font-semibold mt-1">
-                ${extendedProps.amount}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    );
+    return <EventCardContent event={eventInfo.event} allEvents={events} />;
   };
 
 

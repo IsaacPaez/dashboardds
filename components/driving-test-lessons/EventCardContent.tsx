@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import StudentBadges from "./StudentBadges";
 import { isNewStudent, formatAddress, truncateName } from "./utils/studentHelpers";
 
@@ -70,9 +71,12 @@ export default function EventCardContent({
     return (
       <div className="w-full h-full flex flex-col justify-center px-2 py-1">
         <div className="flex items-center justify-between gap-1">
-          <div className="font-bold text-[11px] leading-tight truncate flex-1">
+          <Link
+            href={`/customers/${studentId}`}
+            className="font-bold text-[11px] leading-tight truncate flex-1 hover:underline cursor-pointer"
+          >
             {truncateName(studentName, 12)}
-          </div>
+          </Link>
           <StudentBadges isNew={isNew} isPaid={isPaid} compact={true} />
         </div>
       </div>
@@ -85,9 +89,12 @@ export default function EventCardContent({
       <div className="w-full h-full flex flex-col justify-center px-2 py-1 gap-0.5">
         <div className="flex items-start justify-between gap-1">
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-xs leading-tight truncate">
+            <Link
+              href={`/customers/${studentId}`}
+              className="font-bold text-xs leading-tight truncate block hover:underline cursor-pointer"
+            >
               {truncateName(studentName, 15)}
-            </div>
+            </Link>
             <div className="text-[10px] opacity-80 leading-tight">{classType}</div>
           </div>
           <StudentBadges isNew={isNew} isPaid={isPaid} compact={false} />
@@ -98,13 +105,20 @@ export default function EventCardContent({
 
   // 60+ minute events - full detailed display
   return (
-    <div className="w-full h-full flex flex-col px-2 py-2 gap-1">
-      {/* Header: Name + Badges */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="font-bold text-sm leading-tight flex-1 min-w-0 truncate">
-          {truncateName(studentName, 20)}
-        </div>
+    <div className="w-full h-full flex flex-col px-2 py-2 gap-1 relative">
+      {/* Badges - fixed at top-right */}
+      <div className="absolute top-1 right-1 z-10">
         <StudentBadges isNew={isNew} isPaid={isPaid} compact={false} />
+      </div>
+
+      {/* Student Name - with top padding to avoid badges */}
+      <div className="pt-3">
+        <Link
+          href={`/customers/${studentId}`}
+          className="font-bold text-sm leading-tight block hover:underline cursor-pointer pr-12"
+        >
+          {truncateName(studentName, 20)}
+        </Link>
       </div>
 
       {/* Class Type */}

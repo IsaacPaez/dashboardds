@@ -14,7 +14,6 @@ const LocationInput: React.FC<LocationInputProps> = ({
   className,
 }) => {
   const inputContainerRef = useRef<HTMLDivElement>(null);
-  const [inputValue, setInputValue] = useState(defaultValue || "");
 
   useEffect(() => {
     // Verificar si la API de Google Maps y la librería de places están cargadas
@@ -24,16 +23,16 @@ const LocationInput: React.FC<LocationInputProps> = ({
     }
 
     // Instanciar el Web Component
-    // @ts-ignore - PlaceAutocompleteElement es nuevo y puede no estar en los tipos aún
+    // @ts-expect-error - PlaceAutocompleteElement es nuevo y puede no estar en los tipos aún
     const autocompleteElement = new google.maps.places.PlaceAutocompleteElement();
 
     // Referencia al elemento DOM real que crea el web component (para estilos)
     // Nota: El web component en sí mismo es el input.
-    
+
     // Configurar estilos y atributos
     // Tailwind classes applied via classList or wrapping div
     autocompleteElement.classList.add("w-full", "h-10", "rounded-md", "border", "border-input", "bg-background", "px-3", "py-2", "text-sm", "ring-offset-background", "file:border-0", "file:bg-transparent", "file:text-sm", "file:font-medium", "placeholder:text-muted-foreground", "focus-visible:outline-none", "focus-visible:ring-2", "focus-visible:ring-ring", "focus-visible:ring-offset-2", "disabled:cursor-not-allowed", "disabled:opacity-50");
-    
+
     // Forzar estilos inline para asegurar compatibilidad con temas y overriding de Shadow DOM si fuera posible (limitado)
     // La clave es usar las variables CSS expuestas por el componente de Google
     // --gmp-px-color-surface: Fondo del dropdown
@@ -42,40 +41,44 @@ const LocationInput: React.FC<LocationInputProps> = ({
     autocompleteElement.style.setProperty("--gmp-px-color-on-surface", "#000000");
     autocompleteElement.style.setProperty("--gmp-px-color-on-surface-variant", "#555555"); // Placeholder o texto secundario
     autocompleteElement.style.setProperty("color-scheme", "light"); // Forzar modo claro
-    
+
     // Listener para el evento de selección
     autocompleteElement.addEventListener("gmp-placeselect", (event: any) => {
       const place = event.place;
       if (place && place.formatted_address) {
         onPlaceSelect(place.formatted_address);
-        setInputValue(place.formatted_address);
       }
     });
 
+    // Capturar ref actual para cleanup
+    const container = inputContainerRef.current;
+
     // Añadir al DOM
-    if (inputContainerRef.current) {
-        inputContainerRef.current.innerHTML = ""; // Limpiar contenedor
-        inputContainerRef.current.appendChild(autocompleteElement);
+    if (container) {
+      container.innerHTML = ""; // Limpiar contenedor
+      container.appendChild(autocompleteElement);
     }
-    
-    // Intentar setear valor inicial si existe (No siempre soportado directamente por la API pública en modo controlado, 
-    // pero podemos intentar o dejar que el usuario escriba). 
-    // Actualmente el componente no expone una propiedad "value" simple para escritura bidireccional perfecta en los tipos.
+
+    // Intentar setear valor inicial si existe
+    if (defaultValue) {
+      // @ts-expect-error - value property might strictly not exist on type yet
+      autocompleteElement.value = defaultValue;
+    }
 
     return () => {
       // Cleanup si fuera necesario
-      if (inputContainerRef.current) {
-        inputContainerRef.current.innerHTML = "";
+      if (container) {
+        container.innerHTML = "";
       }
     };
-  }, [onPlaceSelect]);
+  }, [onPlaceSelect, defaultValue]);
 
   return (
     <div className={`w-full ${className}`}>
-        {/* Contenedor para el Web Component */}
-        <div ref={inputContainerRef} className="places-input-container" />
-        
-        <style jsx global>{`
+      {/* Contenedor para el Web Component */}
+      <div ref={inputContainerRef} className="places-input-container" />
+
+      <style jsx global>{`
             /* Estilos globales para asegurar que el popup se vea bien */
             gmp-place-autocomplete {
                 --gmp-px-color-surface: #ffffff;

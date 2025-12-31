@@ -11,8 +11,9 @@ import DashboardHeader from "@/components/layout/DashboardHeader";
 import { useSearchParams, useParams } from "next/navigation";
 import { GovCertificateDialog } from "@/components/ticket/gov-certificate-dialog";
 import { AdiCertificateDialog } from "@/components/ticket/adi-certificate-dialog";
+import { ExportExcelDialog } from "@/components/ticket/export-excel-dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, GraduationCap } from "lucide-react";
+import { FileText, GraduationCap, FileSpreadsheet } from "lucide-react";
 
 export default function TicketClassTypePage() {
   const params = useParams();
@@ -29,6 +30,7 @@ export default function TicketClassTypePage() {
   const [currentClassType, setCurrentClassType] = useState(classtype?.toLowerCase() || 'date');
   const [isGovCertDialogOpen, setIsGovCertDialogOpen] = useState(false);
   const [isAdiCertDialogOpen, setIsAdiCertDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const searchParams = useSearchParams();
 
   // Get URL parameters
@@ -190,6 +192,15 @@ export default function TicketClassTypePage() {
         <DashboardHeader title="Tickets">
           <div className="flex gap-2">
             <Button
+              onClick={() => setIsExportDialogOpen(true)}
+              className="flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4"
+              variant="outline"
+            >
+              <FileSpreadsheet className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Export to Excel</span>
+              <span className="sm:hidden">Export</span>
+            </Button>
+            <Button
               onClick={() => setIsAdiCertDialogOpen(true)}
               className="flex items-center gap-2 text-xs sm:text-sm px-3 sm:px-4"
               variant="outline"
@@ -262,6 +273,11 @@ export default function TicketClassTypePage() {
       <AdiCertificateDialog
         open={isAdiCertDialogOpen}
         onOpenChange={setIsAdiCertDialogOpen}
+      />
+
+      <ExportExcelDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
       />
     </>
   );

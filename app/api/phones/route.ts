@@ -4,10 +4,15 @@ import dbConnect from "@/lib/dbConnect";
 
 export async function GET() {
   try {
-    await dbConnect();
-    
+    const connection = await dbConnect();
+
+    // Ensure connection is ready
+    if (connection.connection.readyState !== 1) {
+      throw new Error("Database connection not ready");
+    }
+
     const phones = await Phone.find({});
-    
+
     return NextResponse.json({
       success: true,
       phones: phones.map(phone => ({
@@ -29,7 +34,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    await dbConnect();
+    const connection = await dbConnect();
+
+    // Ensure connection is ready
+    if (connection.connection.readyState !== 1) {
+      throw new Error("Database connection not ready");
+    }
+
     const data = await req.json();
 
     if (!data.phoneNumber) {

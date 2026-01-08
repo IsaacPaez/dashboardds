@@ -56,16 +56,27 @@ export async function POST(req: NextRequest) {
       const dates = [];
       const currentDate = new Date(startDate);
       const endRecurrenceDate = new Date(endDate);
-      
+
+      // Guardar el día de la semana original para recurrencia semanal (0=Domingo, 6=Sábado)
+      const originalDayOfWeek = currentDate.getDay();
+
       while (currentDate <= endRecurrenceDate) {
         dates.push(currentDate.toISOString().split('T')[0]);
-        
+
         switch (recurrence) {
           case 'daily':
             currentDate.setDate(currentDate.getDate() + 1);
             break;
           case 'weekly':
+            // Sumar 7 días para ir a la próxima semana
             currentDate.setDate(currentDate.getDate() + 7);
+
+            // Verificar que sigue siendo el mismo día de la semana
+            // Si no lo es (por cambios de horario, etc.), ajustar
+            if (currentDate.getDay() !== originalDayOfWeek) {
+              const dayDifference = originalDayOfWeek - currentDate.getDay();
+              currentDate.setDate(currentDate.getDate() + dayDifference);
+            }
             break;
           case 'monthly':
             currentDate.setMonth(currentDate.getMonth() + 1);
@@ -74,7 +85,7 @@ export async function POST(req: NextRequest) {
             break;
         }
       }
-      
+
       return dates;
     };
 

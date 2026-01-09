@@ -54,6 +54,8 @@ const TicketCalendar = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<TicketFormData | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<string>("");
+  const [selectedClassIds, setSelectedClassIds] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const {
     calendarEvents,
@@ -99,29 +101,83 @@ const TicketCalendar = ({
     setIsModalOpen(true);
   };
 
+  /**
+   * Updates the visual state of a checkbox when selection changes
+   */
+  const updateCheckbox = (eventId: string, isSelected: boolean) => {
+    const eventElement = document.querySelector(`[data-event-id="${eventId}"]`);
+    if (eventElement) {
+      const checkbox = eventElement.querySelector('.selection-checkbox') as HTMLElement;
+      if (checkbox) {
+        checkbox.style.background = isSelected ? '#3b82f6' : 'white';
+        checkbox.style.borderColor = isSelected ? '#3b82f6' : '#9ca3af';
+        checkbox.style.opacity = '1';
+        checkbox.innerHTML = isSelected ? '✓' : '';
+      }
+      
+      // Update outline
+      const eventEl = eventElement as HTMLElement;
+      if (isSelected) {
+        eventEl.style.outline = '3px solid #3b82f6';
+        eventEl.style.outlineOffset = '-3px';
+        eventEl.style.opacity = '0.9';
+      } else {
+        eventEl.style.outline = '';
+        eventEl.style.outlineOffset = '';
+        eventEl.style.opacity = '1';
+      }
+    }
+  };
+
   const handleEventClick = (eventInfo: EventClickArg) => {
     const ticketClass = eventInfo.event.extendedProps.ticketClass as TicketClassResponse;
-    if (ticketClass) {
-      setSelectedSlot({
-        _id: ticketClass._id,
-        date: ticketClass.date?.slice(0, 10) || "",
-        hour: ticketClass.hour || "",
-        endHour: ticketClass.endHour || "",
-        type: ticketClass.type || "date",
-        status: ticketClass.status || "available",
-        students: ticketClass.students || [],
-        spots: ticketClass.spots || 30,
-        classId: typeof ticketClass.classId === 'string'
-          ? ticketClass.classId
-          : ticketClass.classId?._id || "",
-        duration: ticketClass.duration || "2h",
-        locationId: typeof ticketClass.locationId === 'string'
-          ? ticketClass.locationId
-          : ticketClass.locationId?._id || "",
-        studentRequests: ticketClass.studentRequests || [],
-      });
-      setIsModalOpen(true);
+    if (!ticketClass) return;
+
+    // Check if the click was on the checkbox
+    const clickedElement = (eventInfo.jsEvent.target as HTMLElement);
+    const isCheckboxClick = clickedElement.classList.contains('selection-checkbox') || 
+                           clickedElement.closest('.selection-checkbox');
+
+    // If clicking checkbox, toggle selection
+    if (isCheckboxClick) {
+      eventInfo.jsEvent.preventDefault();
+      eventInfo.jsEvent.stopPropagation();
+      
+      const newSelected = new Set(selectedClassIds);
+      const isNowSelected = !newSelected.has(ticketClass._id);
+      
+      if (newSelected.has(ticketClass._id)) {
+        newSelected.delete(ticketClass._id);
+      } else {
+        newSelected.add(ticketClass._id);
+      }
+      setSelectedClassIds(newSelected);
+      
+      // Update checkbox immediately
+      updateCheckbox(ticketClass._id, isNowSelected);
+      return;
     }
+
+    // Normal click: open modal
+    setSelectedSlot({
+      _id: ticketClass._id,
+      date: ticketClass.date?.slice(0, 10) || "",
+      hour: ticketClass.hour || "",
+      endHour: ticketClass.endHour || "",
+      type: ticketClass.type || "date",
+      status: ticketClass.status || "available",
+      students: ticketClass.students || [],
+      spots: ticketClass.spots || 30,
+      classId: typeof ticketClass.classId === 'string'
+        ? ticketClass.classId
+        : ticketClass.classId?._id || "",
+      duration: ticketClass.duration || "2h",
+      locationId: typeof ticketClass.locationId === 'string'
+        ? ticketClass.locationId
+        : ticketClass.locationId?._id || "",
+      studentRequests: ticketClass.studentRequests || [],
+    });
+    setIsModalOpen(true);
   };
 
   const handleModalDelete = async (id: string) => {
@@ -149,6 +205,42 @@ const TicketCalendar = ({
     }
   };
 
+  const handleSelectAll = () => {
+    const allIds = new Set(calendarEvents.map(event => event.extendedProps?.ticketClass?._id).filter(Boolean) as string[]);
+    setSelectedClassIds(allIds);
+    
+    // Update all checkboxes
+    setTimeout(() => {
+      allIds.forEach(id => updateCheckbox(id, true));
+    }, 0);
+  };
+
+  const handleDeselectAll = () => {
+    const previousIds = Array.from(selectedClassIds);
+    setSelectedClassIds(new Set());
+    
+    // Update all checkboxes
+    setTimeout(() => {
+      previousIds.forEach(id => updateCheckbox(id, false));
+    }, 0);
+  };
+
+  const handleDeleteSelected = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      // Delete all selected classes
+      await Promise.all(
+        Array.from(selectedClassIds).map(id => deleteTicketClass(id))
+      );
+
+      setSelectedClassIds(new Set());
+      await refreshCalendar();
+    } catch (error) {
+      console.error('Error deleting selected classes:', error);
+      alert(`Error deleting classes: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   return (
     <>
       <Card className={className}>
@@ -159,6 +251,7 @@ const TicketCalendar = ({
           selectedLocationId={selectedLocationId}
           onLocationChange={setSelectedLocationId}
         />
+
         <CardContent className="p-3 sm:p-6">
           <TicketCalendarContent
             events={calendarEvents}
@@ -168,9 +261,66 @@ const TicketCalendar = ({
             focusWeek={focusWeek}
             focusYear={focusYear}
             focusClassId={focusClassId}
+            selectedClassIds={selectedClassIds}
           />
         </CardContent>
       </Card>
+
+      {/* Selection Action Bar */}
+      {selectedClassIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white shadow-2xl rounded-lg border border-gray-200 px-6 py-4 flex items-center gap-4">
+          <span className="text-sm font-medium text-gray-700">
+            {selectedClassIds.size} {selectedClassIds.size === 1 ? 'class' : 'classes'} selected
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSelectAll}
+              className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md transition-colors"
+            >
+              Select All
+            </button>
+            <button
+              onClick={handleDeselectAll}
+              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+            >
+              Deselect All
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="px-3 py-1.5 text-sm bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors"
+            >
+              Delete Selected
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Selected Classes</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete {selectedClassIds.size} selected {selectedClassIds.size === 1 ? 'class' : 'classes'}?
+              This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteSelected}
+                className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && selectedSlot && (
         <ScheduleModal

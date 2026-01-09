@@ -9,7 +9,8 @@ import {
     MapPinCheck,
     Search, // ✅ Importamos el icono de búsqueda
     Ticket,
-    FolderOpen
+    FolderOpen,
+    FileText
   } from "lucide-react";
   
   export const navLinks = [
@@ -77,6 +78,11 @@ import {
       url: "/resources",
       icon: <FolderOpen />,
       label: "Resources",
+    },
+    {
+      url: "/page-content",
+      icon: <FileText />,
+      label: "Page Content",
     }
 
   ];

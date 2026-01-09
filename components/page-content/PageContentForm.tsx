@@ -66,6 +66,14 @@ const pageContentSchema = z.object({
     mobile: z.string().url("Must be a valid URL"),
     desktop: z.string().url("Must be a valid URL"),
   }),
+  featureSection: z
+    .object({
+      title: z.string().min(1, "Title is required").max(200),
+      subtitle: z.string().min(1, "Subtitle is required").max(100),
+      description: z.string().min(10, "Description is required").max(2000),
+      image: z.string().url("Must be a valid URL"),
+    })
+    .optional(),
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 });
@@ -99,6 +107,12 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
         mobile: "",
         desktop: "",
       },
+      featureSection: {
+        title: "",
+        subtitle: "",
+        description: "",
+        image: "",
+      },
       isActive: true,
       order: 0,
     },
@@ -129,7 +143,16 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
           const res = await fetch(`/api/page-content/${contentId}`);
           if (res.ok) {
             const data = await res.json();
-            form.reset(data);
+            // Asegurar que featureSection siempre tenga valores definidos
+            form.reset({
+              ...data,
+              featureSection: data.featureSection || {
+                title: "",
+                subtitle: "",
+                description: "",
+                image: "",
+              },
+            });
           } else {
             toast.error("Failed to fetch page content");
             router.push("/page-content");
@@ -147,6 +170,18 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
 
   const onSubmit = async (values: PageContentFormType) => {
     try {
+      // Si featureSection está vacío, no lo enviamos
+      const payload = { ...values };
+      if (
+        payload.featureSection &&
+        (!payload.featureSection.title ||
+          !payload.featureSection.subtitle ||
+          !payload.featureSection.description ||
+          !payload.featureSection.image)
+      ) {
+        delete payload.featureSection;
+      }
+
       const url = isEditing
         ? `/api/page-content/${contentId}`
         : "/api/page-content";
@@ -155,7 +190,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -537,6 +572,83 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                   </CardContent>
                 </Card>
               ))}
+            </CardContent>
+          </Card>
+
+          {/* Feature Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Feature Section (Optional)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="featureSection.title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feature Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="BBB Accredited Driving Traffic School"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="featureSection.subtitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feature Subtitle</FormLabel>
+                    <FormControl>
+                      <Input placeholder="With A+ Rating" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="featureSection.description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feature Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your feature..."
+                        rows={6}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>Maximum 2000 characters</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="featureSection.image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Feature Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value ? [field.value] : []}
+                        onChange={(url) => field.onChange(url)}
+                        onRemove={() => field.onChange("")}
+                      />
+                    </FormControl>
+                    <FormDescription>Recommended: 800x600px</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
 

@@ -54,6 +54,7 @@ export async function PATCH(req: NextRequest) {
     if (body.statistics !== undefined) updateData.statistics = body.statistics;
     if (body.ctaButtons !== undefined) updateData.ctaButtons = body.ctaButtons;
     if (body.backgroundImage !== undefined) updateData.backgroundImage = body.backgroundImage;
+    if (body.featureSection !== undefined) updateData.featureSection = body.featureSection;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.order !== undefined) updateData.order = body.order;
 

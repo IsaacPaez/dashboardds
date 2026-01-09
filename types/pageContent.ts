@@ -26,6 +26,13 @@ export interface BackgroundImage {
   desktop: string;
 }
 
+export interface FeatureSection {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+}
+
 export type PageType = "home" | "about" | "services" | "contact" | "custom";
 
 export interface PageContentType {
@@ -36,6 +43,7 @@ export interface PageContentType {
   statistics: Statistic[];
   ctaButtons: CtaButton[];
   backgroundImage: BackgroundImage;
+  featureSection?: FeatureSection;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -49,6 +57,7 @@ export interface PageContentFormData {
   statistics: Statistic[];
   ctaButtons: CtaButton[];
   backgroundImage: BackgroundImage;
+  featureSection?: FeatureSection;
   isActive: boolean;
   order: number;
 }

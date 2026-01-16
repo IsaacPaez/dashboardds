@@ -29,7 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import ImageUpload from "../custom ui/ImageUpload";
 import toast from "react-hot-toast";
 import Loader from "../custom ui/Loader";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const pageContentSchema = z.object({
@@ -74,6 +74,30 @@ const pageContentSchema = z.object({
       image: z.string().url("Must be a valid URL"),
     })
     .optional(),
+  benefitsSection: z
+    .object({
+      title: z.object({
+        text: z.string().min(1, "Title is required").max(200),
+        gradientFrom: z.string().default("#27ae60"),
+        gradientVia: z.string().default("#000000"),
+        gradientTo: z.string().default("#0056b3"),
+      }),
+      items: z
+        .array(
+          z.object({
+            image: z.string().url("Must be a valid URL"),
+            title: z.string().min(1, "Title is required").max(100),
+            description: z.string().min(1, "Description is required").max(500),
+            link: z.union([
+              z.string().url("Must be a valid URL"),
+              z.literal(""),
+            ]).optional(),
+            order: z.coerce.number().min(0).default(0),
+          })
+        )
+        .max(10),
+    })
+    .optional(),
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 });
@@ -87,7 +111,21 @@ interface PageContentFormProps {
 const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(!!contentId);
+  const [expandedBenefits, setExpandedBenefits] = useState<Set<number>>(new Set([0]));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["hero", "statistics", "ctaButtons"])
+  );
   const isEditing = !!contentId;
+
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
 
   const form = useForm<PageContentFormType>({
     resolver: zodResolver(pageContentSchema),
@@ -113,6 +151,15 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
         description: "",
         image: "",
       },
+      benefitsSection: {
+        title: {
+          text: "WHY LEARN WITH US?",
+          gradientFrom: "#27ae60",
+          gradientVia: "#000000",
+          gradientTo: "#0056b3",
+        },
+        items: [],
+      },
       isActive: true,
       order: 0,
     },
@@ -136,6 +183,15 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
     name: "ctaButtons",
   });
 
+  const {
+    fields: benefitFields,
+    append: appendBenefit,
+    remove: removeBenefit,
+  } = useFieldArray({
+    control: form.control,
+    name: "benefitsSection.items",
+  });
+
   useEffect(() => {
     if (contentId) {
       const fetchContent = async () => {
@@ -143,6 +199,53 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
           const res = await fetch(`/api/page-content/${contentId}`);
           if (res.ok) {
             const data = await res.json();
+            
+            // Convertir título de benefitsSection si es string a objeto
+            let benefitsSection = data.benefitsSection || {
+              title: {
+                text: "",
+                gradientFrom: "#27ae60",
+                gradientVia: "#000000",
+                gradientTo: "#0056b3"
+              },
+              items: [],
+            };
+            
+            // Si title es string, convertirlo a objeto
+            if (benefitsSection.title && typeof benefitsSection.title === "string") {
+              benefitsSection = {
+                ...benefitsSection,
+                title: {
+                  text: benefitsSection.title,
+                  gradientFrom: "#27ae60",
+                  gradientVia: "#000000",
+                  gradientTo: "#0056b3"
+                }
+              };
+            } else if (!benefitsSection.title) {
+              // Si no hay title, usar objeto por defecto
+              benefitsSection = {
+                ...benefitsSection,
+                title: {
+                  text: "",
+                  gradientFrom: "#27ae60",
+                  gradientVia: "#000000",
+                  gradientTo: "#0056b3"
+                }
+              };
+            } else {
+              // Si title ya es objeto, asegurar que todos los campos existan
+              benefitsSection = {
+                ...benefitsSection,
+                title: {
+                  text: benefitsSection.title.text || "",
+                  gradientFrom: benefitsSection.title.gradientFrom || "#27ae60",
+                  gradientVia: benefitsSection.title.gradientVia || "#000000",
+                  gradientTo: benefitsSection.title.gradientTo || "#0056b3"
+                }
+              };
+            }
+            
             // Asegurar que featureSection siempre tenga valores definidos
             form.reset({
               ...data,
@@ -152,6 +255,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 description: "",
                 image: "",
               },
+              benefitsSection,
             });
           } else {
             toast.error("Failed to fetch page content");
@@ -181,6 +285,18 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
       ) {
         delete payload.featureSection;
       }
+
+      // Si benefitsSection no tiene título o items, no lo enviamos
+      if (
+        !payload.benefitsSection ||
+        !payload.benefitsSection.title ||
+        !payload.benefitsSection.title.text ||
+        payload.benefitsSection.items.length === 0
+      ) {
+        delete payload.benefitsSection;
+      }
+
+      console.log("Payload benefitsSection:", JSON.stringify(payload.benefitsSection, null, 2));
 
       const url = isEditing
         ? `/api/page-content/${contentId}`
@@ -251,10 +367,24 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
           {/* Title Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Title Configuration</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Hero Section</CardTitle>
+                <button
+                  type="button"
+                  onClick={() => toggleSection("hero")}
+                  className="p-1"
+                >
+                  {expandedSections.has("hero") ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
+            {expandedSections.has("hero") && (
+              <CardContent className="space-y-4">
+                <FormField
                 control={form.control}
                 name="title.part1"
                 render={({ field }) => (
@@ -322,45 +452,104 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                   )}
                 />
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Affordable Driving School offers professional..."
-                    rows={4}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Affordable Driving School offers professional..."
+                        rows={4}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Background Images */}
+              <div className="space-y-4">
+                <FormLabel>Background Images</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="backgroundImage.mobile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mobile Background</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          onChange={(url) => field.onChange(url)}
+                          onRemove={() => field.onChange("")}
+                        />
+                      </FormControl>
+                      <FormDescription>Recommended: 1080x1920px</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="backgroundImage.desktop"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Desktop Background</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          onChange={(url) => field.onChange(url)}
+                          onRemove={() => field.onChange("")}
+                        />
+                      </FormControl>
+                      <FormDescription>Recommended: 1920x1080px</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
             )}
-          />
+          </Card>
 
           {/* Statistics */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Statistics</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  appendStatistic({ value: 0, label: "", suffix: "+" })
-                }
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Statistic
-              </Button>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Statistics (Optional)</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendStatistic({ value: 0, label: "", suffix: "+" })
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("statistics")}
+                    className="p-1"
+                  >
+                    {expandedSections.has("statistics") ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            {expandedSections.has("statistics") && (
+              <CardContent className="space-y-4">
               {statisticFields.map((field, index) => (
                 <Card key={field.id}>
                   <CardContent className="pt-6">
@@ -426,25 +615,42 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 </Card>
               ))}
             </CardContent>
+            )}
           </Card>
 
           {/* CTA Buttons */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>CTA Buttons</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  appendCta({ text: "", link: "", actionType: "link", order: 0 })
-                }
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Button
-              </Button>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>CTA Buttons (Optional)</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendCta({ text: "", link: "", actionType: "link", order: 0 })
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("ctaButtons")}
+                    className="p-1"
+                  >
+                    {expandedSections.has("ctaButtons") ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            {expandedSections.has("ctaButtons") && (
+              <CardContent className="space-y-4">
               {ctaFields.map((field, index) => (
                 <Card key={field.id}>
                   <CardContent className="pt-6">
@@ -573,14 +779,29 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 </Card>
               ))}
             </CardContent>
+            )}
           </Card>
 
           {/* Feature Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Feature Section (Optional)</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Feature Section (Optional)</CardTitle>
+                <button
+                  type="button"
+                  onClick={() => toggleSection("featureSection")}
+                  className="p-1"
+                >
+                  {expandedSections.has("featureSection") ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            {expandedSections.has("featureSection") && (
+              <CardContent className="space-y-6">
               <FormField
                 control={form.control}
                 name="featureSection.title"
@@ -650,52 +871,260 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 )}
               />
             </CardContent>
+            )}
           </Card>
 
-          {/* Background Images */}
+          {/* Benefits Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Background Images</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Benefits Section (Optional)</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendBenefit({
+                        image: "",
+                        title: "",
+                        description: "",
+                        link: "",
+                        order: benefitFields.length,
+                      })
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Benefit
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("benefitsSection")}
+                    className="p-1"
+                  >
+                    {expandedSections.has("benefitsSection") ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="backgroundImage.mobile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mobile Background</FormLabel>
-                    <FormControl>
-                      <ImageUpload
-                        value={field.value ? [field.value] : []}
-                        onChange={(url) => field.onChange(url)}
-                        onRemove={() => field.onChange("")}
-                      />
-                    </FormControl>
-                    <FormDescription>Recommended: 1080x1920px</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {expandedSections.has("benefitsSection") && (
+              <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <FormLabel>Section Title</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="benefitsSection.title.text"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title Text</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="WHY LEARN WITH US?"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Main title for the benefits carousel section
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="backgroundImage.desktop"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Desktop Background</FormLabel>
-                    <FormControl>
-                      <ImageUpload
-                        value={field.value ? [field.value] : []}
-                        onChange={(url) => field.onChange(url)}
-                        onRemove={() => field.onChange("")}
-                      />
-                    </FormControl>
-                    <FormDescription>Recommended: 1920x1080px</FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="benefitsSection.title.gradientFrom"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient From</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#27ae60"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="benefitsSection.title.gradientVia"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient Via</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#000000"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="benefitsSection.title.gradientTo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient To</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#0056b3"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {benefitFields.map((field, index) => {
+                  const isExpanded = expandedBenefits.has(index);
+                  const benefitTitle = form.watch(`benefitsSection.items.${index}.title`) || `Benefit ${index + 1}`;
+                  
+                  return (
+                    <Card key={field.id} className="p-4 border-2">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newExpanded = new Set(expandedBenefits);
+                              if (isExpanded) {
+                                newExpanded.delete(index);
+                              } else {
+                                newExpanded.add(index);
+                              }
+                              setExpandedBenefits(newExpanded);
+                            }}
+                            className="flex items-center gap-2 font-semibold hover:text-blue-600 transition-colors"
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                            <span>{benefitTitle}</span>
+                          </button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              removeBenefit(index);
+                              // Remover del estado de expandidos también
+                              const newExpanded = new Set(expandedBenefits);
+                              newExpanded.delete(index);
+                              setExpandedBenefits(newExpanded);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        {isExpanded && (
+                          <>
+                            <FormField
+                              control={form.control}
+                              name={`benefitsSection.items.${index}.image`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Image</FormLabel>
+                                  <FormControl>
+                                    <ImageUpload
+                                      value={field.value ? [field.value] : []}
+                                      onChange={(url) => field.onChange(url)}
+                                      onRemove={() => field.onChange("")}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`benefitsSection.items.${index}.title`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Title (shown on hover)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Experienced Instructors"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`benefitsSection.items.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Description (shown on hover)</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Our instructors are certified..."
+                                      rows={3}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`benefitsSection.items.${index}.link`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Link (Optional - makes image clickeable)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="https://example.com/page"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Leave empty if you don&apos;t want the image to be clickeable
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`benefitsSection.items.${index}.order`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Display Order</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} min="0" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+
+                {benefitFields.length === 0 && (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    No benefit items added yet. Click &quot;Add Benefit&quot; to create one.
+                  </p>
                 )}
-              />
+              </div>
             </CardContent>
+            )}
           </Card>
 
           {/* Settings */}

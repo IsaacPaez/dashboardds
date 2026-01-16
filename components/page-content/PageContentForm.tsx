@@ -98,6 +98,12 @@ const pageContentSchema = z.object({
         .max(10),
     })
     .optional(),
+  drivingLessonsTitle: z.object({
+    text: z.string().max(200).default("OUR DRIVING LESSONS"),
+    gradientFrom: z.string().default("#27ae60"),
+    gradientVia: z.string().default("#000000"),
+    gradientTo: z.string().default("#0056b3"),
+  }),
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 });
@@ -159,6 +165,12 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
           gradientTo: "#0056b3",
         },
         items: [],
+      },
+      drivingLessonsTitle: {
+        text: "OUR DRIVING LESSONS",
+        gradientFrom: "#27ae60",
+        gradientVia: "#000000",
+        gradientTo: "#0056b3",
       },
       isActive: true,
       order: 0,
@@ -246,6 +258,24 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
               };
             }
             
+            // Asegurar que drivingLessonsTitle tenga valores por defecto
+            let drivingLessonsTitle = data.drivingLessonsTitle || {
+              text: "OUR DRIVING LESSONS",
+              gradientFrom: "#27ae60",
+              gradientVia: "#000000",
+              gradientTo: "#0056b3"
+            };
+            
+            // Asegurar que todos los campos existan
+            drivingLessonsTitle = {
+              text: drivingLessonsTitle.text || "OUR DRIVING LESSONS",
+              gradientFrom: drivingLessonsTitle.gradientFrom || "#27ae60",
+              gradientVia: drivingLessonsTitle.gradientVia || "#000000",
+              gradientTo: drivingLessonsTitle.gradientTo || "#0056b3"
+            };
+            
+            console.log("Loading drivingLessonsTitle:", drivingLessonsTitle);
+            
             // Asegurar que featureSection siempre tenga valores definidos
             form.reset({
               ...data,
@@ -256,6 +286,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 image: "",
               },
               benefitsSection,
+              drivingLessonsTitle,
             });
           } else {
             toast.error("Failed to fetch page content");
@@ -296,7 +327,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
         delete payload.benefitsSection;
       }
 
-      console.log("Payload benefitsSection:", JSON.stringify(payload.benefitsSection, null, 2));
+      console.log("Full payload being sent:", JSON.stringify(payload, null, 2));
 
       const url = isEditing
         ? `/api/page-content/${contentId}`
@@ -1122,6 +1153,90 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                     No benefit items added yet. Click &quot;Add Benefit&quot; to create one.
                   </p>
                 )}
+              </div>
+            </CardContent>
+            )}
+          </Card>
+
+          {/* Driving Lessons Title Section */}
+          <Card>
+            <CardHeader>
+              <div 
+                className="flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors -m-6 p-6 rounded-t-lg"
+                onClick={() => toggleSection("drivingLessonsTitle")}
+              >
+                <CardTitle>Driving Lessons Title</CardTitle>
+                {expandedSections.has("drivingLessonsTitle") ? (
+                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                )}
+              </div>
+            </CardHeader>
+            {expandedSections.has("drivingLessonsTitle") && (
+              <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <FormLabel>Section Title</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="drivingLessonsTitle.text"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title Text</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="OUR DRIVING LESSONS"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Main title for the driving lessons section
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="drivingLessonsTitle.gradientFrom"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient From</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#27ae60"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="drivingLessonsTitle.gradientVia"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient Via</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#000000"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="drivingLessonsTitle.gradientTo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gradient To</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="color" value={field.value || "#0056b3"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </CardContent>
             )}

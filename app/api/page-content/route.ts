@@ -62,6 +62,14 @@ export async function POST(req: Request) {
         mobile: body.backgroundImage.mobile,
         desktop: body.backgroundImage.desktop,
       },
+      featureSection: body.featureSection,
+      benefitsSection: body.benefitsSection,
+      drivingLessonsTitle: body.drivingLessonsTitle || {
+        text: "OUR DRIVING LESSONS",
+        gradientFrom: "#27ae60",
+        gradientVia: "#000000",
+        gradientTo: "#0056b3",
+      },
       isActive: body.isActive ?? true,
       order: body.order ?? 0,
     });

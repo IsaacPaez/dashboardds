@@ -71,6 +71,7 @@ export async function POST(req: Request) {
         gradientTo: "#0056b3",
       },
       trafficCoursesSection: body.trafficCoursesSection,
+      areasWeServe: body.areasWeServe,
       isActive: body.isActive ?? true,
       order: body.order ?? 0,
     });

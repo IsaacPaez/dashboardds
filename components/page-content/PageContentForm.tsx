@@ -121,6 +121,10 @@ const pageContentSchema = z.object({
       })
     ).max(4),
   }).optional(),
+  areasWeServe: z.object({
+    title: z.string().min(1, "Title is required").max(200),
+    description: z.string().min(1, "Description is required").max(500),
+  }).optional(),
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 });
@@ -188,6 +192,10 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
         gradientFrom: "#27ae60",
         gradientVia: "#000000",
         gradientTo: "#0056b3",
+      },
+      areasWeServe: {
+        title: "Areas We Serve",
+        description: "We are dedicated to providing world-class driving school services throughout Palm Beach County and surrounding areas.",
       },
       isActive: true,
       order: 0,
@@ -305,6 +313,12 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
             // Asegurar que trafficCoursesSection tenga valores por defecto
             const trafficCoursesSection = data.trafficCoursesSection;
             
+            // Asegurar que areasWeServe tenga valores por defecto
+            const areasWeServe = data.areasWeServe || {
+              title: "Areas We Serve",
+              description: "We are dedicated to providing world-class driving school services throughout Palm Beach County and surrounding areas.",
+            };
+            
             // Asegurar que featureSection siempre tenga valores definidos
             form.reset({
               ...data,
@@ -317,6 +331,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
               benefitsSection,
               drivingLessonsTitle,
               trafficCoursesSection,
+              areasWeServe,
             });
           } else {
             toast.error("Failed to fetch page content");
@@ -1523,6 +1538,65 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                     </p>
                   )}
                 </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Areas We Serve Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Areas We Serve Section (Optional)</CardTitle>
+                <button
+                  type="button"
+                  onClick={() => toggleSection("areasWeServe")}
+                  className="p-1"
+                >
+                  {expandedSections.has("areasWeServe") ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </CardHeader>
+            {expandedSections.has("areasWeServe") && (
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="areasWeServe.title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Section Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Areas We Serve" maxLength={200} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="areasWeServe.description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="We are dedicated to providing world-class driving school services..."
+                          maxLength={500}
+                          rows={4}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Maximum 500 characters
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             )}
           </Card>

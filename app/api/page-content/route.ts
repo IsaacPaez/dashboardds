@@ -70,6 +70,7 @@ export async function POST(req: Request) {
         gradientVia: "#000000",
         gradientTo: "#0056b3",
       },
+      trafficCoursesSection: body.trafficCoursesSection,
       isActive: body.isActive ?? true,
       order: body.order ?? 0,
     });

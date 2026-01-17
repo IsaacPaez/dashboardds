@@ -57,6 +57,7 @@ export async function PATCH(req: NextRequest) {
     if (body.featureSection !== undefined) updateData.featureSection = body.featureSection;
     if (body.benefitsSection !== undefined) updateData.benefitsSection = body.benefitsSection;
     if (body.drivingLessonsTitle !== undefined) updateData.drivingLessonsTitle = body.drivingLessonsTitle;
+    if (body.trafficCoursesSection !== undefined) updateData.trafficCoursesSection = body.trafficCoursesSection;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.order !== undefined) updateData.order = body.order;
 

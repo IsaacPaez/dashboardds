@@ -3,6 +3,7 @@ import { connectToDB } from "@/lib/mongoDB";
 import TicketClass from "@/lib/models/TicketClass";
 import Location from "@/lib/models/Locations";
 import User from "@/lib/models/User";
+import Certificate from "@/lib/models/Certificate";
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -51,6 +52,12 @@ export const GET = async (req: NextRequest) => {
         for (const student of students) {
           // Obtener información completa del estudiante
           const studentDetails = await User.findById(student).lean();
+
+          // Obtener información del certificado para este estudiante y clase
+          const certificate = await Certificate.findOne({
+            studentId: student,
+            classId: ticketClass.classId,
+          }).lean();
 
           const row: any = {};
 
@@ -115,6 +122,33 @@ export const GET = async (req: NextRequest) => {
             if (selectedColumns.includes("studentZip")) {
               row.studentZip = studentDetails.zipCode || "";
             }
+            if (selectedColumns.includes("licenseNumber")) {
+              row.licenseNumber = studentDetails.licenseNumber || "";
+            }
+          }
+
+          // Información del certificado
+          if (certificate) {
+            if (selectedColumns.includes("ticketNumber")) {
+              row.ticketNumber = certificate.citation_number || "";
+            }
+            if (selectedColumns.includes("county")) {
+              row.county = certificate.country_ticket || "";
+            }
+            if (selectedColumns.includes("classReason")) {
+              row.classReason = certificate.reason || "";
+            }
+          } else {
+            // Si no hay certificado, dejar los campos vacíos
+            if (selectedColumns.includes("ticketNumber")) {
+              row.ticketNumber = "";
+            }
+            if (selectedColumns.includes("county")) {
+              row.county = "";
+            }
+            if (selectedColumns.includes("classReason")) {
+              row.classReason = "";
+            }
           }
 
           exportData.push(row);
@@ -164,6 +198,10 @@ export const GET = async (req: NextRequest) => {
         if (selectedColumns.includes("studentCity")) row.studentCity = "";
         if (selectedColumns.includes("studentState")) row.studentState = "";
         if (selectedColumns.includes("studentZip")) row.studentZip = "";
+        if (selectedColumns.includes("licenseNumber")) row.licenseNumber = "";
+        if (selectedColumns.includes("ticketNumber")) row.ticketNumber = "";
+        if (selectedColumns.includes("county")) row.county = "";
+        if (selectedColumns.includes("classReason")) row.classReason = "";
 
         exportData.push(row);
       }

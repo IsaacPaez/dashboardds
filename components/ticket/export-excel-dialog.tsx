@@ -30,6 +30,10 @@ const AVAILABLE_COLUMNS = [
   { id: "hour", label: "Start Time", category: "basic" },
   { id: "endHour", label: "End Time", category: "basic" },
   { id: "duration", label: "Duration", category: "basic" },
+  { id: "licenseNumber", label: "License Number", category: "basic" },
+  { id: "ticketNumber", label: "Ticket Number", category: "basic" },
+  { id: "county", label: "County", category: "basic" },
+  { id: "classReason", label: "Class Reason", category: "basic" },
   { id: "type", label: "Class Type", category: "class" },
   { id: "status", label: "Status", category: "class" },
   { id: "location", label: "Location", category: "class" },
@@ -63,6 +67,7 @@ export function ExportExcelDialog({ open, onOpenChange }: ExportExcelDialogProps
   const [availableClassTypes, setAvailableClassTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingClassTypes, setIsLoadingClassTypes] = useState(true);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Cargar tipos de clases disponibles al abrir el dialog
   useEffect(() => {
@@ -205,7 +210,7 @@ export function ExportExcelDialog({ open, onOpenChange }: ExportExcelDialogProps
           {/* Date Selector */}
           <div className="space-y-2">
             <Label className="text-base font-semibold">Select Date</Label>
-            <Popover>
+            <Popover modal={true} open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -218,8 +223,15 @@ export function ExportExcelDialog({ open, onOpenChange }: ExportExcelDialogProps
                   {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar onSelect={(date) => setSelectedDate(date)} />
+              <PopoverContent className="w-auto p-0 bg-white shadow-lg border" align="start" sideOffset={5}>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    setIsCalendarOpen(false);
+                  }}
+                />
               </PopoverContent>
             </Popover>
           </div>

@@ -504,8 +504,8 @@ export default function ContactForm() {
                   {showCalendar && (
                     <div className="z-50 bg-white rounded shadow p-4">
                       <Calendar
-                        onSelect={date => setTempDate(date)}
-                        locale={enUS}
+                        mode="single"
+                        onSelect={date => setTempDate(date || null)}
                       />
                       <div className="flex gap-2 mt-2">
                         <select value={tempHour} onChange={e => setTempHour(e.target.value)} className="border rounded p-2">

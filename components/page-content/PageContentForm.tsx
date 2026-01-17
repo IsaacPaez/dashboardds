@@ -104,6 +104,23 @@ const pageContentSchema = z.object({
     gradientVia: z.string().default("#000000"),
     gradientTo: z.string().default("#0056b3"),
   }),
+  trafficCoursesSection: z.object({
+    title: z.object({
+      text: z.string().min(1, "Title is required").max(100),
+      gradientFrom: z.string().default("#27ae60"),
+      gradientTo: z.string().default("#ffffff"),
+    }),
+    backgroundImage: z.string().url("Must be a valid URL"),
+    cards: z.array(
+      z.object({
+        title: z.string().min(1, "Title is required").max(100),
+        items: z.array(z.string()).max(10),
+        ctaText: z.string().min(1, "CTA text is required").max(50),
+        ctaLink: z.string().min(1, "CTA link is required"),
+        order: z.coerce.number().min(0).default(0),
+      })
+    ).max(4),
+  }).optional(),
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 });
@@ -204,6 +221,15 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
     name: "benefitsSection.items",
   });
 
+  const {
+    fields: trafficCourseCardFields,
+    append: appendTrafficCourseCard,
+    remove: removeTrafficCourseCard,
+  } = useFieldArray({
+    control: form.control,
+    name: "trafficCoursesSection.cards",
+  });
+
   useEffect(() => {
     if (contentId) {
       const fetchContent = async () => {
@@ -276,6 +302,9 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
             
             console.log("Loading drivingLessonsTitle:", drivingLessonsTitle);
             
+            // Asegurar que trafficCoursesSection tenga valores por defecto
+            const trafficCoursesSection = data.trafficCoursesSection;
+            
             // Asegurar que featureSection siempre tenga valores definidos
             form.reset({
               ...data,
@@ -287,6 +316,7 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
               },
               benefitsSection,
               drivingLessonsTitle,
+              trafficCoursesSection,
             });
           } else {
             toast.error("Failed to fetch page content");
@@ -1239,6 +1269,261 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 </div>
               </div>
             </CardContent>
+            )}
+          </Card>
+
+          {/* Traffic Courses Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Traffic Courses Section (Optional)</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      appendTrafficCourseCard({
+                        title: "",
+                        items: [""],
+                        ctaText: "",
+                        ctaLink: "",
+                        order: trafficCourseCardFields.length,
+                      })
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Card
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("trafficCoursesSection")}
+                    className="p-1"
+                  >
+                    {expandedSections.has("trafficCoursesSection") ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </CardHeader>
+            {expandedSections.has("trafficCoursesSection") && (
+              <CardContent className="space-y-6">
+                {/* Title */}
+                <div className="space-y-4">
+                  <FormLabel>Section Title</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="trafficCoursesSection.title.text"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title Text</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="TRAFFIC COURSES"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="trafficCoursesSection.title.gradientFrom"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gradient From</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="color" value={field.value || "#27ae60"} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="trafficCoursesSection.title.gradientTo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gradient To (usually white)</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="color" value={field.value || "#ffffff"} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Background Image */}
+                <FormField
+                  control={form.control}
+                  name="trafficCoursesSection.backgroundImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Background Image</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          onChange={(url) => field.onChange(url)}
+                          onRemove={() => field.onChange("")}
+                        />
+                      </FormControl>
+                      <FormDescription>Recommended: 1920x600px</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Cards */}
+                <div className="space-y-4">
+                  <FormLabel>Course Cards (Max 4)</FormLabel>
+                  {trafficCourseCardFields.map((field, cardIndex) => (
+                    <Card key={field.id} className="p-4 border-2">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-semibold">Card {cardIndex + 1}</h4>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeTrafficCourseCard(cardIndex)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name={`trafficCoursesSection.cards.${cardIndex}.title`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Card Title</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Live Classroom"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="space-y-2">
+                          <FormLabel>List Items</FormLabel>
+                          {form.watch(`trafficCoursesSection.cards.${cardIndex}.items`)?.map((_, itemIndex) => (
+                            <div key={itemIndex} className="flex gap-2">
+                              <FormField
+                                control={form.control}
+                                name={`trafficCoursesSection.cards.${cardIndex}.items.${itemIndex}`}
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Enter item text"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  const currentItems = form.getValues(`trafficCoursesSection.cards.${cardIndex}.items`) || [];
+                                  const newItems = currentItems.filter((_, i) => i !== itemIndex);
+                                  form.setValue(`trafficCoursesSection.cards.${cardIndex}.items`, newItems);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const currentItems = form.getValues(`trafficCoursesSection.cards.${cardIndex}.items`) || [];
+                              if (currentItems.length < 10) {
+                                form.setValue(`trafficCoursesSection.cards.${cardIndex}.items`, [...currentItems, ""]);
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Item
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`trafficCoursesSection.cards.${cardIndex}.ctaText`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>CTA Button Text</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="View Courses"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`trafficCoursesSection.cards.${cardIndex}.ctaLink`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>CTA Link</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="/traffic-courses"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name={`trafficCoursesSection.cards.${cardIndex}.order`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Display Order</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} min="0" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </Card>
+                  ))}
+
+                  {trafficCourseCardFields.length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      No cards added yet. Click &quot;Add Card&quot; to create one.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
             )}
           </Card>
 

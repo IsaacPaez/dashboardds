@@ -37,6 +37,24 @@ export interface IDrivingLessonsTitleConfig {
   gradientTo: string;
 }
 
+export interface ITrafficCourseCard {
+  title: string;
+  items: string[];
+  ctaText: string;
+  ctaLink: string;
+  order: number;
+}
+
+export interface ITrafficCoursesSection {
+  title: {
+    text: string;
+    gradientFrom: string;
+    gradientTo: string;
+  };
+  backgroundImage: string;
+  cards: ITrafficCourseCard[];
+}
+
 export interface IBackgroundImage {
   mobile: string;
   desktop: string;
@@ -72,6 +90,7 @@ export interface IPageContent extends Document {
   featureSection?: IFeatureSection;
   benefitsSection?: IBenefitsSection;
   drivingLessonsTitle?: IDrivingLessonsTitleConfig;
+  trafficCoursesSection?: ITrafficCoursesSection;
   isActive: boolean;
   order: number;
   createdAt: Date;
@@ -204,6 +223,80 @@ const DrivingLessonsTitleConfigSchema = new Schema<IDrivingLessonsTitleConfig>(
     gradientTo: {
       type: String,
       default: "#0056b3",
+    },
+  },
+  { _id: false }
+);
+
+const TrafficCourseCardSchema = new Schema<ITrafficCourseCard>(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
+    items: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function(arr: string[]) {
+          return arr.length <= 10;
+        },
+        message: "Cannot have more than 10 items per card"
+      }
+    },
+    ctaText: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 50,
+    },
+    ctaLink: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    order: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+  },
+  { _id: false }
+);
+
+const TrafficCoursesSectionSchema = new Schema<ITrafficCoursesSection>(
+  {
+    title: {
+      text: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 100,
+      },
+      gradientFrom: {
+        type: String,
+        default: "#27ae60",
+      },
+      gradientTo: {
+        type: String,
+        default: "#ffffff",
+      },
+    },
+    backgroundImage: {
+      type: String,
+      required: true,
+    },
+    cards: {
+      type: [TrafficCourseCardSchema],
+      default: [],
+      validate: {
+        validator: function(arr: ITrafficCourseCard[]) {
+          return arr.length <= 4;
+        },
+        message: "Cannot have more than 4 cards"
+      }
     },
   },
   { _id: false }
@@ -348,6 +441,10 @@ const PageContentSchema: Schema = new Schema(
     },
     drivingLessonsTitle: {
       type: DrivingLessonsTitleConfigSchema,
+      required: false,
+    },
+    trafficCoursesSection: {
+      type: TrafficCoursesSectionSchema,
       required: false,
     },
     isActive: {

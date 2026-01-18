@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+// Import models to ensure they are registered
+import '@/lib/models/Phone';
+
 const MONGODB_URL = process.env.MONGODB_URL;
 if (!MONGODB_URL) {
     throw new Error('Please define the MONGODB_URL environment variable');

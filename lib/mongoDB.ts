@@ -18,6 +18,7 @@ import "@/lib/models/EmailTemplate";
 import "@/lib/models/Certificate";
 import "@/lib/models/ResumenSeccion";
 import "@/lib/models/Payments";
+import "@/lib/models/Phone";
 
 const MONGODB_URL = process.env.MONGODB_URL || "";
 

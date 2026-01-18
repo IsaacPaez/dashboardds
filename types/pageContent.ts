@@ -40,6 +40,16 @@ export interface FeatureSection {
   image: string;
 }
 
+export interface CorporateProgramsSection {
+  title: string;
+  subtitle: string;
+  description: string;
+  ctaMessage: string;
+  ctaText: string;
+  ctaLink: string;
+  image: string;
+}
+
 export interface BenefitItem {
   image: string;
   title: string;
@@ -65,6 +75,7 @@ export interface PageContentType {
   backgroundImage: BackgroundImage;
   featureSection?: FeatureSection;
   benefitsSection?: BenefitsSection;
+  corporateProgramsSection?: CorporateProgramsSection;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -80,6 +91,7 @@ export interface PageContentFormData {
   backgroundImage: BackgroundImage;
   featureSection?: FeatureSection;
   benefitsSection?: BenefitsSection;
+  corporateProgramsSection?: CorporateProgramsSection;
   isActive: boolean;
   order: number;
 }

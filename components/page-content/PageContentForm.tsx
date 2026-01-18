@@ -74,6 +74,17 @@ const pageContentSchema = z.object({
       image: z.string().url("Must be a valid URL"),
     })
     .optional(),
+  corporateProgramsSection: z
+    .object({
+      title: z.string().min(1, "Title is required").max(200),
+      subtitle: z.string().min(1, "Subtitle is required").max(200),
+      description: z.string().min(10, "Description is required").max(2000),
+      ctaMessage: z.string().min(1, "CTA Message is required").max(200),
+      ctaText: z.string().min(1, "CTA Text is required").max(50),
+      ctaLink: z.string().min(1, "CTA Link is required").max(500),
+      image: z.string().url("Must be a valid URL"),
+    })
+    .optional(),
   benefitsSection: z
     .object({
       title: z.object({
@@ -176,6 +187,15 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
         title: "",
         subtitle: "",
         description: "",
+        image: "",
+      },
+      corporateProgramsSection: {
+        title: "",
+        subtitle: "",
+        description: "",
+        ctaMessage: "",
+        ctaText: "",
+        ctaLink: "",
         image: "",
       },
       benefitsSection: {
@@ -328,6 +348,15 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                 description: "",
                 image: "",
               },
+              corporateProgramsSection: data.corporateProgramsSection || {
+                title: "",
+                subtitle: "",
+                description: "",
+                ctaMessage: "",
+                ctaText: "",
+                ctaLink: "",
+                image: "",
+              },
               benefitsSection,
               drivingLessonsTitle,
               trafficCoursesSection,
@@ -360,6 +389,20 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
           !payload.featureSection.image)
       ) {
         delete payload.featureSection;
+      }
+
+      // Si corporateProgramsSection está vacío, no lo enviamos
+      if (
+        payload.corporateProgramsSection &&
+        (!payload.corporateProgramsSection.title ||
+          !payload.corporateProgramsSection.subtitle ||
+          !payload.corporateProgramsSection.description ||
+          !payload.corporateProgramsSection.ctaMessage ||
+          !payload.corporateProgramsSection.ctaText ||
+          !payload.corporateProgramsSection.ctaLink ||
+          !payload.corporateProgramsSection.image)
+      ) {
+        delete payload.corporateProgramsSection;
       }
 
       // Si benefitsSection no tiene título o items, no lo enviamos
@@ -910,6 +953,156 @@ const PageContentForm: React.FC<PageContentFormProps> = ({ contentId }) => {
                       />
                     </FormControl>
                     <FormDescription>Recommended: 800x600px</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            )}
+          </Card>
+
+          {/* Corporate Programs Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Corporate Programs Section (Optional)</CardTitle>
+                <button
+                  type="button"
+                  onClick={() => toggleSection("corporateProgramsSection")}
+                  className="p-1"
+                >
+                  {expandedSections.has("corporateProgramsSection") ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </CardHeader>
+            {expandedSections.has("corporateProgramsSection") && (
+              <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Corporate Programs"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.subtitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subtitle</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Upskill Your Organization" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your corporate programs... (Use double line breaks for paragraphs)"
+                        rows={8}
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>Maximum 2000 characters. Use double line breaks (Enter twice) for paragraph separation.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.ctaMessage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CTA Message</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Contact us for more information"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>Message shown before the button</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.ctaText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CTA Button Text</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Inquire Now"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.ctaLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CTA Button Link</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="/contact"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormDescription>Internal link (e.g., /contact) or external URL</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="corporateProgramsSection.image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value ? [field.value] : []}
+                        onChange={(url) => field.onChange(url)}
+                        onRemove={() => field.onChange("")}
+                      />
+                    </FormControl>
+                    <FormDescription>Recommended: 900x400px</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

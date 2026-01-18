@@ -63,6 +63,7 @@ export async function POST(req: Request) {
         desktop: body.backgroundImage.desktop,
       },
       featureSection: body.featureSection,
+      corporateProgramsSection: body.corporateProgramsSection,
       benefitsSection: body.benefitsSection,
       drivingLessonsTitle: body.drivingLessonsTitle || {
         text: "OUR DRIVING LESSONS",

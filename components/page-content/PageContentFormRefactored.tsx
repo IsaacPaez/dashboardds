@@ -11,8 +11,10 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDes
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ArrowUpDown } from "lucide-react";
 import toast from "react-hot-toast";
 import Loader from "../custom ui/Loader";
+import { SectionOrderModal } from "../modals/SectionOrderModal";
 
 // Import modular sections
 import {
@@ -37,6 +39,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set([])
   );
+  const [sectionOrderModalOpen, setSectionOrderModalOpen] = useState(false);
   const isEditing = !!contentId;
 
   const toggleSection = (section: string) => {
@@ -262,12 +265,26 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
   if (loading) return <Loader />;
 
   const sectionProps = { form, expandedSections, toggleSection };
+  const pageType = form.watch("pageType");
 
   return (
     <div className="p-10 mx-auto bg-white rounded-lg shadow-md max-w-7xl">
-      <h1 className="text-2xl font-semibold">
-        {isEditing ? "Edit Page Content" : "Create New Page Content"}
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">
+          {isEditing ? "Edit Page Content" : "Create New Page Content"}
+        </h1>
+        {isEditing && pageType === "home" && contentId && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setSectionOrderModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            Reorder Sections
+          </Button>
+        )}
+      </div>
       <Separator className="bg-gray-300 my-4" />
 
       <Form {...form}>
@@ -352,6 +369,15 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           </div>
         </form>
       </Form>
+
+      {/* Section Order Modal */}
+      {contentId && (
+        <SectionOrderModal
+          isOpen={sectionOrderModalOpen}
+          onClose={() => setSectionOrderModalOpen(false)}
+          contentId={contentId}
+        />
+      )}
     </div>
   );
 };

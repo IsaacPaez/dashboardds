@@ -107,6 +107,8 @@ export interface IPageContent extends Document {
   drivingLessonsTitle?: IDrivingLessonsTitleConfig;
   trafficCoursesSection?: ITrafficCoursesSection;
   corporateProgramsSection?: ICorporateProgramsSection;
+  areasWeServe?: IAreasWeServeConfig;
+  sectionOrder?: { id: string; order: number }[];
   isActive: boolean;
   order: number;
   createdAt: Date;
@@ -533,6 +535,15 @@ const PageContentSchema: Schema = new Schema(
     },
     areasWeServe: {
       type: AreasWeServeConfigSchema,
+      required: false,
+    },
+    sectionOrder: {
+      type: [
+        {
+          id: { type: String, required: true },
+          order: { type: Number, required: true },
+        },
+      ],
       required: false,
     },
     isActive: {

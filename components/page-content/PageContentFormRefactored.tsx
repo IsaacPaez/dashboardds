@@ -17,8 +17,6 @@ import Loader from "../custom ui/Loader";
 // Import modular sections
 import {
   HeroSection,
-  StatisticsSection,
-  CTAButtonsSection,
   FeatureSection,
   CorporateProgramsSection,
   BenefitsSection,
@@ -37,7 +35,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["hero", "statistics", "ctaButtons"])
+    new Set([])
   );
   const isEditing = !!contentId;
 
@@ -302,8 +300,6 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
 
           {/* Modular Sections */}
           <HeroSection {...sectionProps} />
-          <StatisticsSection {...sectionProps} />
-          <CTAButtonsSection {...sectionProps} />
           <FeatureSection {...sectionProps} />
           <CorporateProgramsSection {...sectionProps} />
           <BenefitsSection {...sectionProps} />

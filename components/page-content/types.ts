@@ -24,25 +24,25 @@ export const ctaButtonSchema = z.object({
 });
 
 export const backgroundImageSchema = z.object({
-  mobile: z.string().url("Must be a valid URL"),
-  desktop: z.string().url("Must be a valid URL"),
+  mobile: z.string().default(""),
+  desktop: z.string().default(""),
 });
 
 export const featureSectionSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200),
-  subtitle: z.string().min(1, "Subtitle is required").max(100),
-  description: z.string().min(10, "Description is required").max(2000),
-  image: z.string().url("Must be a valid URL"),
+  title: z.string().max(200).default(""),
+  subtitle: z.string().max(100).default(""),
+  description: z.string().max(2000).default(""),
+  image: z.string().default(""),
 }).optional();
 
 export const corporateProgramsSectionSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200),
-  subtitle: z.string().min(1, "Subtitle is required").max(200),
-  description: z.string().min(10, "Description is required").max(2000),
-  ctaMessage: z.string().min(1, "CTA Message is required").max(200),
-  ctaText: z.string().min(1, "CTA Text is required").max(50),
-  ctaLink: z.string().min(1, "CTA Link is required").max(500),
-  image: z.string().url("Must be a valid URL"),
+  title: z.string().max(200).default(""),
+  subtitle: z.string().max(200).default(""),
+  description: z.string().max(2000).default(""),
+  ctaMessage: z.string().max(200).default(""),
+  ctaText: z.string().max(50).default(""),
+  ctaLink: z.string().max(500).default(""),
+  image: z.string().default(""),
 }).optional();
 
 export const benefitsSectionSchema = z.object({
@@ -96,22 +96,155 @@ export const areasWeServeSchema = z.object({
   description: z.string().min(1, "Description is required").max(500),
 }).optional();
 
-// Main schema
+export const lessonsPageSchema = z.object({
+  title: z.object({
+    part1: z.string().max(100).default(""),
+    part2: z.string().max(100).default(""),
+    part3: z.string().max(100).default(""),
+  }),
+  description: z.string().max(2000).default(""),
+  mainImage: z.string().url("Must be a valid URL").default(""),
+  cards: z.array(
+    z.object({
+      title: z.string().min(1, "Title is required").max(100),
+      description: z.string().min(1, "Description is required").max(500),
+      buttonText: z.string().min(1, "Button text is required").max(50),
+      buttonLink: z.string().min(1, "Button link is required"),
+      buttonColor: z.enum(["blue", "green", "red", "yellow"]).default("blue"),
+    })
+  ).max(3, "Maximum 3 cards allowed").default([]),
+}).optional();
+
+// Main schema with conditional validation
 export const pageContentSchema = z.object({
-  pageType: z.enum(["home", "about", "services", "contact", "custom"]),
-  title: titleSchema,
-  description: z.string().min(10, "Description is required").max(1000),
-  statistics: z.array(statisticSchema).max(10),
-  ctaButtons: z.array(ctaButtonSchema).max(5),
-  backgroundImage: backgroundImageSchema,
+  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons"]),
+  title: titleSchema.optional(),
+  description: z.string().max(1000).optional(),
+  statistics: z.array(statisticSchema).max(10).optional(),
+  ctaButtons: z.array(ctaButtonSchema).max(5).optional(),
+  backgroundImage: backgroundImageSchema.optional(),
   featureSection: featureSectionSchema,
   corporateProgramsSection: corporateProgramsSectionSchema,
   benefitsSection: benefitsSectionSchema,
-  drivingLessonsTitle: drivingLessonsTitleSchema,
+  drivingLessonsTitle: drivingLessonsTitleSchema.optional(),
   trafficCoursesSection: trafficCoursesSectionSchema,
   areasWeServe: areasWeServeSchema,
+  lessonsPage: lessonsPageSchema,
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
+}).superRefine((data, ctx) => {
+  // Validate lessons page fields when pageType is "lessons"
+  if (data.pageType === "lessons") {
+    console.log("🔍 Validating lessons page:", data.lessonsPage);
+    
+    if (!data.lessonsPage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Lessons page content is required",
+        path: ["lessonsPage"],
+      });
+      return;
+    }
+    
+    if (!data.lessonsPage.title?.part1 || data.lessonsPage.title.part1.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Part 1 is required",
+        path: ["lessonsPage", "title", "part1"],
+      });
+    }
+    
+    if (!data.lessonsPage.title?.part2 || data.lessonsPage.title.part2.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Part 2 is required",
+        path: ["lessonsPage", "title", "part2"],
+      });
+    }
+    
+    if (!data.lessonsPage.title?.part3 || data.lessonsPage.title.part3.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Part 3 is required",
+        path: ["lessonsPage", "title", "part3"],
+      });
+    }
+    
+    if (!data.lessonsPage.description || data.lessonsPage.description.trim().length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Description is required (minimum 10 characters)",
+        path: ["lessonsPage", "description"],
+      });
+    }
+    
+    if (!data.lessonsPage.mainImage || data.lessonsPage.mainImage.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Main image is required",
+        path: ["lessonsPage", "mainImage"],
+      });
+    } else {
+      // Validate URL format
+      try {
+        new URL(data.lessonsPage.mainImage);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Must be a valid URL",
+          path: ["lessonsPage", "mainImage"],
+        });
+      }
+    }
+    
+    return; // Skip home validation for lessons
+  }
+  
+  // Validate home page fields when pageType is NOT "lessons"
+  if (!data.description || data.description.trim().length < 10) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Description is required (minimum 10 characters)",
+      path: ["description"],
+    });
+  }
+  
+  // Validate backgroundImage URLs for non-lessons pages
+  if (!data.backgroundImage?.mobile || data.backgroundImage.mobile.trim() === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Mobile background image is required",
+      path: ["backgroundImage", "mobile"],
+    });
+  } else {
+    try {
+      new URL(data.backgroundImage.mobile);
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must be a valid URL",
+        path: ["backgroundImage", "mobile"],
+      });
+    }
+  }
+  
+  if (!data.backgroundImage?.desktop || data.backgroundImage.desktop.trim() === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Desktop background image is required",
+      path: ["backgroundImage", "desktop"],
+    });
+  } else {
+    try {
+      new URL(data.backgroundImage.desktop);
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must be a valid URL",
+        path: ["backgroundImage", "desktop"],
+      });
+    }
+  }
 });
 
 export type PageContentFormType = z.infer<typeof pageContentSchema>;

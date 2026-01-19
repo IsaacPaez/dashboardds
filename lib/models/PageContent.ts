@@ -95,8 +95,27 @@ export interface IBenefitsSection {
   items: IBenefitItem[];
 }
 
+export interface ILessonsCard {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  buttonColor: string; // e.g., "blue" or "green"
+}
+
+export interface ILessonsPageContent {
+  title: {
+    part1: string; // "LEARN"
+    part2: string; // "ROAD SKILLS"
+    part3: string; // "FOR LIFE"
+  };
+  description: string;
+  mainImage: string;
+  cards: ILessonsCard[];
+}
+
 export interface IPageContent extends Document {
-  pageType: "home" | "about" | "services" | "contact" | "custom";
+  pageType: "home" | "about" | "services" | "contact" | "custom" | "lessons";
   title: ITitleConfig;
   description: string;
   statistics: IStatistic[];
@@ -108,6 +127,7 @@ export interface IPageContent extends Document {
   trafficCoursesSection?: ITrafficCoursesSection;
   corporateProgramsSection?: ICorporateProgramsSection;
   areasWeServe?: IAreasWeServeConfig;
+  lessonsPage?: ILessonsPageContent;
   sectionOrder?: { id: string; order: number }[];
   isActive: boolean;
   order: number;
@@ -479,23 +499,23 @@ const PageContentSchema: Schema = new Schema(
   {
     pageType: {
       type: String,
-      enum: ["home", "about", "services", "contact", "custom"],
+      enum: ["home", "about", "services", "contact", "custom", "lessons"],
       required: true,
       index: true,
     },
     title: {
       type: TitleConfigSchema,
-      required: true,
+      required: false,
     },
     description: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       maxlength: 1000,
     },
     statistics: {
       type: [StatisticSchema],
-      default: [],
+      required: false,
       validate: {
         validator: (arr: IStatistic[]) => arr.length <= 10,
         message: "Maximum 10 statistics allowed",
@@ -503,7 +523,7 @@ const PageContentSchema: Schema = new Schema(
     },
     ctaButtons: {
       type: [CtaButtonSchema],
-      default: [],
+      required: false,
       validate: {
         validator: (arr: ICtaButton[]) => arr.length <= 5,
         message: "Maximum 5 CTA buttons allowed",
@@ -511,7 +531,7 @@ const PageContentSchema: Schema = new Schema(
     },
     backgroundImage: {
       type: BackgroundImageSchema,
-      required: true,
+      required: false,
     },
     featureSection: {
       type: FeatureSectionSchema,
@@ -535,6 +555,34 @@ const PageContentSchema: Schema = new Schema(
     },
     areasWeServe: {
       type: AreasWeServeConfigSchema,
+      required: false,
+    },
+    lessonsPage: {
+      type: new Schema({
+        title: {
+          part1: { type: String, required: true },
+          part2: { type: String, required: true },
+          part3: { type: String, required: true },
+        },
+        description: { type: String, required: true },
+        mainImage: { type: String, required: true },
+        cards: {
+          type: [
+            {
+              title: { type: String, required: true },
+              description: { type: String, required: true },
+              buttonText: { type: String, required: true },
+              buttonLink: { type: String, required: true },
+              buttonColor: { type: String, required: true },
+            },
+          ],
+          required: false,
+          validate: {
+            validator: (arr: any[]) => arr.length <= 3,
+            message: "Maximum 3 cards allowed",
+          },
+        },
+      }),
       required: false,
     },
     sectionOrder: {

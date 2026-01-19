@@ -37,9 +37,44 @@ export async function POST(req: Request) {
   try {
     await connectToDB();
     const body = await req.json();
+    
+    console.log("🔵 API received body:", JSON.stringify(body, null, 2));
 
-    // Validación de datos requeridos
-    if (!body.pageType || !body.title || !body.description || !body.backgroundImage) {
+    // Validación basada en pageType
+    if (!body.pageType) {
+      console.log("❌ Missing pageType");
+      return NextResponse.json(
+        { message: "pageType is required" },
+        { status: 400 }
+      );
+    }
+
+    // Para lessons, solo validar lessonsPage
+    if (body.pageType === "lessons") {
+      console.log("🎓 Processing lessons page");
+      if (!body.lessonsPage) {
+        console.log("❌ Missing lessonsPage");
+        return NextResponse.json(
+          { message: "lessonsPage is required for lessons pageType" },
+          { status: 400 }
+        );
+      }
+      
+      console.log("💾 Creating new lessons page content:", body.lessonsPage);
+      const newPageContent = new PageContent({
+        pageType: body.pageType,
+        lessonsPage: body.lessonsPage,
+        isActive: body.isActive ?? true,
+        order: body.order ?? 0,
+      });
+
+      await newPageContent.save();
+      console.log("✅ Saved successfully:", newPageContent._id);
+      return NextResponse.json(newPageContent, { status: 201 });
+    }
+
+    // Para otros tipos, validar campos tradicionales
+    if (!body.title || !body.description || !body.backgroundImage) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }

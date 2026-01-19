@@ -54,31 +54,73 @@ export const columns: ColumnDef<PageContentType>[] = [
   {
     accessorKey: "backgroundImage",
     header: "Preview",
-    cell: ({ row }) => (
-      <Image
-        src={row.original.backgroundImage.desktop}
-        alt={`${row.original.pageType} background`}
-        width={120}
-        height={80}
-        className="rounded-lg object-cover border border-gray-300 shadow-md"
-      />
-    ),
+    cell: ({ row }) => {
+      // For lessons type, show mainImage
+      if (row.original.pageType === "lessons") {
+        if (!row.original.lessonsPage?.mainImage) {
+          return (
+            <div className="w-[120px] h-[80px] rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+              No image
+            </div>
+          );
+        }
+        return (
+          <Image
+            src={row.original.lessonsPage.mainImage}
+            alt="Lessons main image"
+            width={120}
+            height={80}
+            className="rounded-lg object-cover border border-gray-300 shadow-md"
+          />
+        );
+      }
+      
+      // For other types, show backgroundImage.desktop
+      if (!row.original.backgroundImage?.desktop) {
+        return (
+          <div className="w-[120px] h-[80px] rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+            No image
+          </div>
+        );
+      }
+      
+      return (
+        <Image
+          src={row.original.backgroundImage.desktop}
+          alt={`${row.original.pageType} background`}
+          width={120}
+          height={80}
+          className="rounded-lg object-cover border border-gray-300 shadow-md"
+        />
+      );
+    },
   },
   {
     accessorKey: "title",
     header: "Title",
-    cell: ({ row }) => (
-      <Link
-        href={`/page-content/${row.original._id}`}
-        className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
-      >
-        <div className="flex flex-col">
-          <span className="font-semibold text-blue-500">{row.original.title.part1}</span>
-          <span className="text-gray-700">{row.original.title.part2}</span>
-        </div>
-        <ArrowUpRight size={16} className="opacity-75" />
-      </Link>
-    ),
+    cell: ({ row }) => {
+      // For lessons type, get title from lessonsPage
+      const titlePart1 = row.original.pageType === "lessons" 
+        ? row.original.lessonsPage?.title?.part1 || "Lessons"
+        : row.original.title?.part1 || "Untitled";
+      
+      const titlePart2 = row.original.pageType === "lessons"
+        ? row.original.lessonsPage?.title?.part2 || ""
+        : row.original.title?.part2 || "";
+      
+      return (
+        <Link
+          href={`/page-content/${row.original._id}`}
+          className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
+        >
+          <div className="flex flex-col">
+            <span className="font-semibold text-blue-500">{titlePart1}</span>
+            {titlePart2 && <span className="text-gray-700">{titlePart2}</span>}
+          </div>
+          <ArrowUpRight size={16} className="opacity-75" />
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "description",

@@ -1,4 +1,4 @@
-import PageContentForm from "@/components/page-content/PageContentForm";
+import PageContentForm from "@/components/page-content/PageContentFormRefactored";
 
 interface PageContentDetailProps {
   params: Promise<{

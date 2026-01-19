@@ -1,0 +1,363 @@
+// PageContentFormRefactored.tsx
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Separator } from "../ui/separator";
+import { Button } from "@/components/ui/button";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import toast from "react-hot-toast";
+import Loader from "../custom ui/Loader";
+
+// Import modular sections
+import {
+  HeroSection,
+  StatisticsSection,
+  CTAButtonsSection,
+  FeatureSection,
+  CorporateProgramsSection,
+  BenefitsSection,
+  DrivingLessonsTitleSection,
+  AreasWeServeSection
+} from "./sections";
+
+// Import types and schemas
+import { pageContentSchema, PageContentFormType } from "./types";
+
+interface PageContentFormProps {
+  contentId?: string;
+}
+
+const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["hero", "statistics", "ctaButtons"])
+  );
+  const isEditing = !!contentId;
+
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const form = useForm<PageContentFormType>({
+    resolver: zodResolver(pageContentSchema),
+    defaultValues: {
+      pageType: "home",
+      title: {
+        part1: "Learn To Drive",
+        part2: "Safely For Life",
+        gradientFrom: "#4CAF50",
+        gradientVia: "#43e97b",
+        gradientTo: "#38f9d7",
+      },
+      description: "",
+      statistics: [],
+      ctaButtons: [],
+      backgroundImage: {
+        mobile: "",
+        desktop: "",
+      },
+      featureSection: {
+        title: "",
+        subtitle: "",
+        description: "",
+        image: "",
+      },
+      corporateProgramsSection: {
+        title: "",
+        subtitle: "",
+        description: "",
+        ctaMessage: "",
+        ctaText: "",
+        ctaLink: "",
+        image: "",
+      },
+      benefitsSection: {
+        title: {
+          text: "WHY LEARN WITH US?",
+          gradientFrom: "#27ae60",
+          gradientVia: "#000000",
+          gradientTo: "#0056b3",
+        },
+        items: [],
+      },
+      drivingLessonsTitle: {
+        text: "OUR DRIVING LESSONS",
+        gradientFrom: "#27ae60",
+        gradientVia: "#000000",
+        gradientTo: "#0056b3",
+      },
+      areasWeServe: {
+        title: "Areas We Serve",
+        description: "We are dedicated to providing world-class driving school services throughout Palm Beach County and surrounding areas.",
+      },
+      isActive: true,
+      order: 0,
+    },
+  });
+
+  // Load existing content if editing
+  useEffect(() => {
+    if (contentId) {
+      const fetchContent = async () => {
+        try {
+          setLoading(true);
+          const res = await fetch(`/api/page-content/${contentId}`);
+          
+          if (res.ok) {
+            const data = await res.json();
+            // Handle benefitsSection title migration (string to object)
+            let benefitsSection = data.benefitsSection;
+            if (benefitsSection && typeof benefitsSection.title === "string") {
+              benefitsSection = {
+                ...benefitsSection,
+                title: {
+                  text: benefitsSection.title || "",
+                  gradientFrom: "#27ae60",
+                  gradientVia: "#000000",
+                  gradientTo: "#0056b3",
+                },
+              };
+            } else if (benefitsSection) {
+              benefitsSection = {
+                ...benefitsSection,
+                title: {
+                  text: benefitsSection.title.text || "",
+                  gradientFrom: benefitsSection.title.gradientFrom || "#27ae60",
+                  gradientVia: benefitsSection.title.gradientVia || "#000000",
+                  gradientTo: benefitsSection.title.gradientTo || "#0056b3",
+                },
+              };
+            }
+
+            // Handle drivingLessonsTitle defaults
+            let drivingLessonsTitle = data.drivingLessonsTitle || {
+              text: "OUR DRIVING LESSONS",
+              gradientFrom: "#27ae60",
+              gradientVia: "#000000",
+              gradientTo: "#0056b3",
+            };
+
+            drivingLessonsTitle = {
+              text: drivingLessonsTitle.text || "OUR DRIVING LESSONS",
+              gradientFrom: drivingLessonsTitle.gradientFrom || "#27ae60",
+              gradientVia: drivingLessonsTitle.gradientVia || "#000000",
+              gradientTo: drivingLessonsTitle.gradientTo || "#0056b3",
+            };
+
+            const trafficCoursesSection = data.trafficCoursesSection;
+            const areasWeServe = data.areasWeServe || {
+              title: "Areas We Serve",
+              description: "We are dedicated to providing world-class driving school services throughout Palm Beach County and surrounding areas.",
+            };
+
+            form.reset({
+              ...data,
+              featureSection: data.featureSection || {
+                title: "",
+                subtitle: "",
+                description: "",
+                image: "",
+              },
+              corporateProgramsSection: data.corporateProgramsSection || {
+                title: "",
+                subtitle: "",
+                description: "",
+                ctaMessage: "",
+                ctaText: "",
+                ctaLink: "",
+                image: "",
+              },
+              benefitsSection,
+              drivingLessonsTitle,
+              trafficCoursesSection,
+              areasWeServe,
+            });
+          } else {
+            const errorData = await res.json();
+            toast.error(errorData.message || "Failed to fetch page content");
+            router.push("/page-content");
+          }
+        } catch (error) {
+          console.error("[FETCH_CONTENT_ERROR]", error);
+          toast.error("Error loading page content");
+          router.push("/page-content");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchContent();
+    }
+  }, [contentId, form, router]);
+
+  const onSubmit = async (values: PageContentFormType) => {
+    try {
+      const payload = { ...values };
+      
+      // Clean up empty optional sections
+      if (
+        payload.featureSection &&
+        (!payload.featureSection.title ||
+          !payload.featureSection.subtitle ||
+          !payload.featureSection.description ||
+          !payload.featureSection.image)
+      ) {
+        delete payload.featureSection;
+      }
+
+      if (
+        payload.corporateProgramsSection &&
+        (!payload.corporateProgramsSection.title ||
+          !payload.corporateProgramsSection.subtitle ||
+          !payload.corporateProgramsSection.description ||
+          !payload.corporateProgramsSection.ctaMessage ||
+          !payload.corporateProgramsSection.ctaText ||
+          !payload.corporateProgramsSection.ctaLink ||
+          !payload.corporateProgramsSection.image)
+      ) {
+        delete payload.corporateProgramsSection;
+      }
+
+      if (
+        !payload.benefitsSection ||
+        !payload.benefitsSection.title ||
+        !payload.benefitsSection.title.text ||
+        payload.benefitsSection.items.length === 0
+      ) {
+        delete payload.benefitsSection;
+      }
+
+      const url = isEditing ? `/api/page-content/${contentId}` : "/api/page-content";
+      const method = isEditing ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        toast.success(`Page content ${isEditing ? "updated" : "created"} successfully`);
+        router.push("/page-content");
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Failed to submit form");
+      }
+    } catch (error) {
+      console.error("[SUBMIT_ERROR]", error);
+      toast.error("Something went wrong!");
+    }
+  };
+
+  if (loading) return <Loader />;
+
+  const sectionProps = { form, expandedSections, toggleSection };
+
+  return (
+    <div className="p-10 mx-auto bg-white rounded-lg shadow-md max-w-7xl">
+      <h1 className="text-2xl font-semibold">
+        {isEditing ? "Edit Page Content" : "Create New Page Content"}
+      </h1>
+      <Separator className="bg-gray-300 my-4" />
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Page Type */}
+          <FormField
+            control={form.control}
+            name="pageType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Page Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select page type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="home">Home</SelectItem>
+                    <SelectItem value="about">About</SelectItem>
+                    <SelectItem value="services">Services</SelectItem>
+                    <SelectItem value="contact">Contact</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Modular Sections */}
+          <HeroSection {...sectionProps} />
+          <StatisticsSection {...sectionProps} />
+          <CTAButtonsSection {...sectionProps} />
+          <FeatureSection {...sectionProps} />
+          <CorporateProgramsSection {...sectionProps} />
+          <BenefitsSection {...sectionProps} />
+          <DrivingLessonsTitleSection {...sectionProps} />
+          {/* Traffic Courses Section - Note: This one needs special handling due to cards */}
+          <AreasWeServeSection {...sectionProps} />
+
+          {/* Settings */}
+          <div className="flex gap-6">
+            <FormField
+              control={form.control}
+              name="order"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Display Order</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} min="0" />
+                  </FormControl>
+                  <FormDescription>Higher numbers appear first</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-4 flex-1">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Active Status</FormLabel>
+                    <FormDescription>Enable to show this on the website</FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Submit */}
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" onClick={() => router.push("/page-content")}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-blue-600 text-white">
+              {isEditing ? "Update" : "Create"} Page Content
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default PageContentFormRefactored;

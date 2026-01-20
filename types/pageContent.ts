@@ -63,7 +63,26 @@ export interface BenefitsSection {
   items: BenefitItem[];
 }
 
-export type PageType = "home" | "about" | "services" | "contact" | "custom";
+export interface LessonsCard {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  buttonColor: string;
+}
+
+export interface LessonsPageContent {
+  title: {
+    part1: string;
+    part2: string;
+    part3: string;
+  };
+  description: string;
+  mainImage: string;
+  cards: LessonsCard[];
+}
+
+export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "custom";
 
 export interface PageContentType {
   _id: string;
@@ -76,6 +95,7 @@ export interface PageContentType {
   featureSection?: FeatureSection;
   benefitsSection?: BenefitsSection;
   corporateProgramsSection?: CorporateProgramsSection;
+  lessonsPage?: LessonsPageContent;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -92,6 +112,7 @@ export interface PageContentFormData {
   featureSection?: FeatureSection;
   benefitsSection?: BenefitsSection;
   corporateProgramsSection?: CorporateProgramsSection;
+  lessonsPage?: LessonsPageContent;
   isActive: boolean;
   order: number;
 }

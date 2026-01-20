@@ -125,9 +125,27 @@ export const onlineCoursesPageSchema = z.object({
   description: z.string().max(2000).default(""),
 }).optional();
 
+// Driving Test page schema
+export const drivingTestInfoBoxSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  points: z.array(z.string().min(1, "Point cannot be empty")).min(1, "At least one point is required"),
+});
+
+export const drivingTestPageSchema = z.object({
+  title: z.string().max(200).default(""),
+  cta: z.object({
+    text: z.string().max(50).default(""),
+    link: z.string().max(500).default(""),
+  }).default({ text: "", link: "" }),
+  subtitle: z.string().max(200).default(""),
+  description: z.string().max(2000).default(""),
+  infoBoxes: z.array(drivingTestInfoBoxSchema).max(3, "Maximum 3 info boxes allowed").default([]),
+  image: z.string().default(""),
+}).optional();
+
 // Main schema with conditional validation
 export const pageContentSchema = z.object({
-  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons", "classes", "onlineCourses"]),
+  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons", "classes", "onlineCourses", "drivingTest"]),
   title: titleSchema.optional(),
   description: z.string().max(1000).optional(),
   statistics: z.array(statisticSchema).max(10).optional(),
@@ -142,6 +160,7 @@ export const pageContentSchema = z.object({
   lessonsPage: lessonsPageSchema,
   classesPage: classesPageSchema,
   onlineCoursesPage: onlineCoursesPageSchema,
+  drivingTestPage: drivingTestPageSchema,
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 }).superRefine((data, ctx) => {
@@ -278,7 +297,90 @@ export const pageContentSchema = z.object({
     return; // Skip home validation for online courses
   }
   
-  // Validate home page fields when pageType is NOT "lessons", "classes", or "onlineCourses"
+  // Validate driving test page fields when pageType is "drivingTest"
+  if (data.pageType === "drivingTest") {
+    console.log("🔍 Validating driving test page:", data.drivingTestPage);
+    
+    if (!data.drivingTestPage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Driving test page content is required",
+        path: ["drivingTestPage"],
+      });
+      return;
+    }
+    
+    if (!data.drivingTestPage.title || data.drivingTestPage.title.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Title is required",
+        path: ["drivingTestPage", "title"],
+      });
+    }
+    
+    if (!data.drivingTestPage.cta?.text || data.drivingTestPage.cta.text.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "CTA text is required",
+        path: ["drivingTestPage", "cta", "text"],
+      });
+    }
+    
+    if (!data.drivingTestPage.cta?.link || data.drivingTestPage.cta.link.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "CTA link is required",
+        path: ["drivingTestPage", "cta", "link"],
+      });
+    }
+    
+    if (!data.drivingTestPage.subtitle || data.drivingTestPage.subtitle.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Subtitle is required",
+        path: ["drivingTestPage", "subtitle"],
+      });
+    }
+    
+    if (!data.drivingTestPage.description || data.drivingTestPage.description.trim() === "" || data.drivingTestPage.description.trim().length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Description is required (minimum 10 characters)",
+        path: ["drivingTestPage", "description"],
+      });
+    }
+    
+    if (!data.drivingTestPage.image || data.drivingTestPage.image.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Image is required",
+        path: ["drivingTestPage", "image"],
+      });
+    } else {
+      try {
+        new URL(data.drivingTestPage.image);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Image must be a valid URL",
+          path: ["drivingTestPage", "image"],
+        });
+      }
+    }
+    
+    if (!data.drivingTestPage.infoBoxes || data.drivingTestPage.infoBoxes.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "At least one info box is required",
+        path: ["drivingTestPage", "infoBoxes"],
+      });
+    }
+    
+    console.log("✅ Driving Test validation passed");
+    return; // Skip home validation for driving test
+  }
+  
+  // Validate home page fields when pageType is NOT "lessons", "classes", "onlineCourses", or "drivingTest"
   if (!data.description || data.description.trim().length < 10) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

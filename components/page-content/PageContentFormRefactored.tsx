@@ -36,6 +36,125 @@ interface PageContentFormProps {
   contentId?: string;
 }
 
+// DrivingTestInfoBoxesSection Component
+const DrivingTestInfoBoxesSection: React.FC<{ control: any }> = ({ control }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "drivingTestPage.infoBoxes",
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Information Boxes (Max 3)</h3>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            append({
+              title: "",
+              points: [""],
+            });
+          }}
+          disabled={fields.length >= 3}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Info Box
+        </Button>
+      </div>
+
+      {fields.map((field, boxIndex) => (
+        <InfoBoxItem key={field.id} control={control} boxIndex={boxIndex} remove={remove} />
+      ))}
+    </div>
+  );
+};
+
+// InfoBoxItem Component - separate to use hooks properly
+const InfoBoxItem: React.FC<{ control: any; boxIndex: number; remove: (index: number) => void }> = ({ control, boxIndex, remove }) => {
+  const { fields: boxPointsFields, append: appendPoint, remove: removePoint } = useFieldArray({
+    control,
+    name: `drivingTestPage.infoBoxes.${boxIndex}.points` as const,
+  });
+
+  return (
+    <Card className="p-4 bg-gray-50">
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <FormField
+            control={control}
+            name={`drivingTestPage.infoBoxes.${boxIndex}.title`}
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Box Title</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value || ""} placeholder="e.g., This Service Includes:" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => remove(boxIndex)}
+            className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-8"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Points */}
+        <div className="space-y-2 pl-4 border-l-2 border-blue-200">
+          <div className="flex items-center justify-between">
+            <FormLabel>Bullet Points</FormLabel>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => appendPoint("")}
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Add Point
+            </Button>
+          </div>
+          {boxPointsFields.map((pointField, pointIndex) => (
+            <div key={pointField.id} className="flex items-center gap-2">
+              <FormField
+                control={control}
+                name={`drivingTestPage.infoBoxes.${boxIndex}.points.${pointIndex}`}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        placeholder="e.g., Vehicle for the Road Test" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removePoint(pointIndex)}
+                className="text-red-500 hover:text-red-700"
+                disabled={boxPointsFields.length === 1}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -125,6 +244,17 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
       onlineCoursesPage: {
         title: "",
         description: "",
+      },
+      drivingTestPage: {
+        title: "",
+        cta: {
+          text: "",
+          link: "",
+        },
+        subtitle: "",
+        description: "",
+        infoBoxes: [],
+        image: "",
       },
       isActive: true,
       order: 0,
@@ -234,6 +364,14 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               lessonsPage,
               classesPage,
               onlineCoursesPage,
+              drivingTestPage: data.drivingTestPage || {
+                title: "",
+                cta: { text: "", link: "" },
+                subtitle: "",
+                description: "",
+                infoBoxes: [],
+                image: "",
+              },
             });
           } else {
             const errorData = await res.json();
@@ -287,6 +425,15 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           order: values.order,
         };
         console.log("📦 Online Courses payload:", payload);
+      } else if (values.pageType === "drivingTest") {
+        // For driving test page, only send drivingTest-specific data
+        payload = {
+          pageType: values.pageType,
+          drivingTestPage: values.drivingTestPage,
+          isActive: values.isActive,
+          order: values.order,
+        };
+        console.log("📦 Driving Test payload:", payload);
       } else {
         // For other pages, use the original cleanup logic
         payload = { ...values };
@@ -417,6 +564,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
                     <SelectItem value="lessons">Lessons</SelectItem>
                     <SelectItem value="classes">Classes</SelectItem>
                     <SelectItem value="onlineCourses">Online Courses</SelectItem>
+                    <SelectItem value="drivingTest">Driving Test</SelectItem>
                     <SelectItem value="custom">Custom</SelectItem>
                   </SelectContent>
                 </Select>
@@ -426,7 +574,10 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           />
 
           {/* Modular Sections - Show based on pageType */}
-          {form.watch("pageType") !== "lessons" && form.watch("pageType") !== "classes" && form.watch("pageType") !== "onlineCourses" && (
+          {form.watch("pageType") !== "lessons" && 
+           form.watch("pageType") !== "classes" && 
+           form.watch("pageType") !== "onlineCourses" && 
+           form.watch("pageType") !== "drivingTest" && (
             <>
               <HeroSection {...sectionProps} />
               <FeatureSection {...sectionProps} />
@@ -526,6 +677,125 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
                         />
                       </FormControl>
                       <FormDescription>Brief description that appears below the title</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Driving Test Page Section */}
+          {form.watch("pageType") === "drivingTest" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Driving Test Page Content</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Title */}
+                <FormField
+                  control={form.control}
+                  name="drivingTestPage.title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="e.g., DRIVING TEST" />
+                      </FormControl>
+                      <FormDescription>Main page title</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* CTA */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold">Call to Action Button</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="drivingTestPage.cta.text"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Button Text</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ""} placeholder="e.g., Book Driving Test" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="drivingTestPage.cta.link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Button Link</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value || ""} placeholder="/book-test" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Subtitle */}
+                <FormField
+                  control={form.control}
+                  name="drivingTestPage.subtitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subtitle</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="e.g., We give the Road Test !!" />
+                      </FormControl>
+                      <FormDescription>Appears below CTA button</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Description */}
+                <FormField
+                  control={form.control}
+                  name="drivingTestPage.description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="Enter detailed description about the driving test service" 
+                          rows={5}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Info Boxes */}
+                <DrivingTestInfoBoxesSection control={form.control} />
+
+                {/* Image */}
+                <FormField
+                  control={form.control}
+                  name="drivingTestPage.image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Main Image</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          onChange={(url) => field.onChange(url)}
+                          onRemove={() => field.onChange("")}
+                        />
+                      </FormControl>
+                      <FormDescription>Upload image for the driving test page</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -92,7 +92,24 @@ export interface OnlineCoursesPageContent {
   description: string;
 }
 
-export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "classes" | "onlineCourses" | "custom";
+export interface DrivingTestInfoBox {
+  title: string;
+  points: string[];
+}
+
+export interface DrivingTestPageContent {
+  title: string;
+  cta: {
+    text: string;
+    link: string;
+  };
+  subtitle: string;
+  description: string;
+  infoBoxes: DrivingTestInfoBox[];
+  image: string;
+}
+
+export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "classes" | "onlineCourses" | "drivingTest" | "custom";
 
 export interface PageContentType {
   _id: string;
@@ -107,6 +124,8 @@ export interface PageContentType {
   corporateProgramsSection?: CorporateProgramsSection;
   lessonsPage?: LessonsPageContent;
   classesPage?: ClassesPageContent;
+  onlineCoursesPage?: OnlineCoursesPageContent;
+  drivingTestPage?: DrivingTestPageContent;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -126,6 +145,7 @@ export interface PageContentFormData {
   lessonsPage?: LessonsPageContent;
   classesPage?: ClassesPageContent;
   onlineCoursesPage?: OnlineCoursesPageContent;
+  drivingTestPage?: DrivingTestPageContent;
   isActive: boolean;
   order: number;
 }

@@ -75,6 +75,26 @@ export const columns: ColumnDef<PageContentType>[] = [
         );
       }
       
+      // For driving test type, show drivingTestPage image
+      if (row.original.pageType === "drivingTest") {
+        if (!row.original.drivingTestPage?.image) {
+          return (
+            <div className="w-[120px] h-[80px] rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+              No image
+            </div>
+          );
+        }
+        return (
+          <Image
+            src={row.original.drivingTestPage.image}
+            alt="Driving test image"
+            width={120}
+            height={80}
+            className="rounded-lg object-cover border border-gray-300 shadow-md"
+          />
+        );
+      }
+      
       // For other types, show backgroundImage.desktop
       if (!row.original.backgroundImage?.desktop) {
         return (
@@ -136,6 +156,21 @@ export const columns: ColumnDef<PageContentType>[] = [
       // For online courses type, get title from onlineCoursesPage
       if (row.original.pageType === "onlineCourses") {
         const title = row.original.onlineCoursesPage?.title || "Online Courses";
+        
+        return (
+          <Link
+            href={`/page-content/${row.original._id}`}
+            className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
+          >
+            <span className="font-semibold text-blue-500">{title}</span>
+            <ArrowUpRight size={16} className="opacity-75" />
+          </Link>
+        );
+      }
+      
+      // For driving test type, get title from drivingTestPage
+      if (row.original.pageType === "drivingTest") {
+        const title = row.original.drivingTestPage?.title || "Driving Test";
         
         return (
           <Link

@@ -63,6 +63,7 @@ export async function PATCH(req: NextRequest) {
     if (body.lessonsPage !== undefined) updateData.lessonsPage = body.lessonsPage;
     if (body.classesPage !== undefined) updateData.classesPage = body.classesPage;
     if (body.onlineCoursesPage !== undefined) updateData.onlineCoursesPage = body.onlineCoursesPage;
+    if (body.drivingTestPage !== undefined) updateData.drivingTestPage = body.drivingTestPage;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.order !== undefined) updateData.order = body.order;
 

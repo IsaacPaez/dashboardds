@@ -123,9 +123,24 @@ export interface IOnlineCoursesPageContent {
   title: string;
   description: string;
 }
+export interface IDrivingTestInfoBox {
+  title: string;
+  points: string[];
+}
 
+export interface IDrivingTestPageContent {
+  title?: string;
+  cta?: {
+    text: string;
+    link: string;
+  };
+  subtitle?: string;
+  description?: string;
+  infoBoxes?: IDrivingTestInfoBox[];
+  image?: string;
+}
 export interface IPageContent extends Document {
-  pageType: "home" | "about" | "services" | "contact" | "custom" | "lessons" | "classes" | "onlineCourses";
+  pageType: "home" | "about" | "services" | "contact" | "custom" | "lessons" | "classes" | "onlineCourses" | "drivingTest";
   title: ITitleConfig;
   description: string;
   statistics: IStatistic[];
@@ -140,6 +155,7 @@ export interface IPageContent extends Document {
   lessonsPage?: ILessonsPageContent;
   classesPage?: IClassesPageContent;
   onlineCoursesPage?: IOnlineCoursesPageContent;
+  drivingTestPage?: IDrivingTestPageContent;
   sectionOrder?: { id: string; order: number }[];
   isActive: boolean;
   order: number;
@@ -511,7 +527,7 @@ const PageContentSchema: Schema = new Schema(
   {
     pageType: {
       type: String,
-      enum: ["home", "about", "services", "contact", "custom", "lessons", "classes", "onlineCourses"],
+      enum: ["home", "about", "services", "contact", "custom", "lessons", "classes", "onlineCourses", "drivingTest"],
       required: true,
       index: true,
     },
@@ -608,6 +624,35 @@ const PageContentSchema: Schema = new Schema(
       type: new Schema({
         title: { type: String, required: false },
         description: { type: String, required: false },
+      }),
+      required: false,
+    },
+    drivingTestPage: {
+      type: new Schema({
+        title: { type: String, required: false },
+        cta: {
+          type: new Schema({
+            text: { type: String, required: false },
+            link: { type: String, required: false },
+          }),
+          required: false,
+        },
+        subtitle: { type: String, required: false },
+        description: { type: String, required: false },
+        infoBoxes: {
+          type: [
+            {
+              title: { type: String, required: true },
+              points: { type: [String], required: true },
+            },
+          ],
+          required: false,
+          validate: {
+            validator: (arr: any[]) => arr.length <= 3,
+            message: "Maximum 3 info boxes allowed",
+          },
+        },
+        image: { type: String, required: false },
       }),
       required: false,
     },

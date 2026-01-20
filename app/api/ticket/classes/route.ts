@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import TicketClass from "@/lib/models/TicketClass";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 import Joi from "joi";
 import Location from "@/lib/models/Locations";
 import DrivingClass from "@/lib/models/Class";
@@ -46,7 +46,7 @@ interface DrivingClassDoc {
 
 export async function POST(req: NextRequest) {
   try {
-    await connectToDB();
+    await dbConnect();
     const requestData = await req.json();
     // console.log("[API] ticket/classes POST - requestData:", requestData);
     
@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    await connectToDB();
+    await dbConnect();
     const queryType = req.nextUrl.searchParams.get("type");
     let query = {};
 

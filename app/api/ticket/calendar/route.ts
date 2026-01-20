@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import TicketClass from "@/lib/models/TicketClass";
 // import Location from "@/lib/models/Locations";
 // import DrivingClass from "@/lib/models/Class";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 
 export async function GET() {
   try {
-    await connectToDB();
+    await dbConnect();
     
     // Obtener todas las ticket classes con datos populados
     const ticketClasses = await TicketClass.find({})
@@ -22,7 +22,15 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  await connectToDB();
+  try {
+    await dbConnect();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      { success: false, message: "Database connection error" },
+      { status: 500 }
+    );
+  }
   const data = await req.json();
   // Solo permitimos los campos válidos
   const {

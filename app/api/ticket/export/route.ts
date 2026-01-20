@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 import TicketClass from "@/lib/models/TicketClass";
 import Location from "@/lib/models/Locations";
 import User from "@/lib/models/User";
@@ -7,7 +7,7 @@ import Certificate from "@/lib/models/Certificate";
 
 export const GET = async (req: NextRequest) => {
   try {
-    await connectToDB();
+    await dbConnect();
 
     // Obtener parámetros de la URL
     const searchParams = req.nextUrl.searchParams;

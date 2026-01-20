@@ -17,12 +17,17 @@ export async function GET(
   { params }: { params: Promise<{ contentId: string }> }
 ) {
   try {
+    console.log("🔌 Attempting to connect to database...");
     await dbConnect();
+    console.log("✅ Database connected");
 
     const { contentId } = await params;
+    console.log("📋 Fetching page content for ID:", contentId);
+    
     const pageContent = await PageContent.findById(contentId);
 
     if (!pageContent) {
+      console.log("⚠️ Page content not found for ID:", contentId);
       return NextResponse.json(
         { error: "Page content not found" },
         { status: 404 }
@@ -37,8 +42,9 @@ export async function GET(
     return NextResponse.json(sectionOrder, { status: 200 });
   } catch (error) {
     console.error("❌ Error fetching section order:", error);
+    console.error("❌ Error details:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
-      { error: "Failed to fetch section order" },
+      { error: "Failed to fetch section order", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

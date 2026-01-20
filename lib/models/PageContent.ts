@@ -687,12 +687,9 @@ PageContentSchema.statics.getActiveContent = function (
   return this.findOne({ pageType, isActive: true }).sort({ order: -1 });
 };
 
-// Eliminar el modelo si ya existe para forzar la recreación con el nuevo schema
-if (mongoose.models.PageContent) {
-  delete mongoose.models.PageContent;
-}
-
+// Use existing model if available, otherwise create new one
 const PageContent: Model<IPageContent> =
+  mongoose.models.PageContent || 
   mongoose.model<IPageContent>("PageContent", PageContentSchema);
 
 export default PageContent;

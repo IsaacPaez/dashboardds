@@ -25,6 +25,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
   const calendarRef = useRef<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [selectedEventIds, setSelectedEventIds] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // Clipboard para copiar/pegar eventos
   const clipboardKey = 'driving_schedule_clipboard';
@@ -38,16 +40,12 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
     try {
       setLoading(true);
       setError(null);
-      // console.log("Fetching events for instructor:", selectedInstructor._id);
       
       const response = await fetch(`/api/driving-test-lessons/events?instructorId=${selectedInstructor._id}`);
-      // console.log("Response status:", response.status);
       
       if (response.ok) {
         const data = await response.json();
-        // console.log("Events data:", data);
         
-        // Formatear los eventos para mostrar mejor información
         const formattedEvents = data.map((event: any) => ({
           ...event,
           title: formatEventTitle(event),
@@ -69,19 +67,16 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
     }
   };
 
-  // Función para formatear el título del evento
   const formatEventTitle = (event: any) => {
     const classType = event.classType === 'driving test' ? 'Driving Test' : 'Driving Lesson';
     const status = event.status;
     
     let title = `${classType} - ${status}`;
     
-    // Agregar nombre del estudiante si está reservado o pendiente
     if ((status === 'booked' || status === 'pending') && event.studentName) {
       title += ` (${event.studentName})`;
     }
     
-    // Agregar información de pago para driving test
     if (event.classType === 'driving test' && event.amount) {
       title += ` - $${event.amount}`;
     }
@@ -90,18 +85,14 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
   };
 
   useEffect(() => {
-    // console.log("Calendar component mounted/updated for instructor:", selectedInstructor?._id);
     fetchEvents();
   }, [selectedInstructor?._id]);
 
-  // Efecto para navegar a la fecha objetivo desde notificaciones y resaltar evento específico
   useEffect(() => {
     if (targetDate && calendarRef.current) {
-
       const calendarApi = calendarRef.current.getApi();
       calendarApi.gotoDate(targetDate);
 
-      // Resaltar el evento específico si se proporciona el eventId
       if (targetEventId) {
         setTimeout(() => {
           const targetEventElement = document.querySelector(`[data-event-id="${targetEventId}"]`) ||
@@ -109,26 +100,20 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
                                   document.querySelector(`.fc-event[data-event-id="${targetEventId}"]`);
 
           if (targetEventElement) {
-            // Scroll al evento específico
             targetEventElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            // Añadir clase de resaltado
             targetEventElement.classList.add('highlight-notification-event');
 
-            // Remover el resaltado después de 5 segundos
             setTimeout(() => {
               targetEventElement.classList.remove('highlight-notification-event');
             }, 5000);
           } else {
-            // Si no encontramos el elemento específico, al menos hacemos scroll a la fecha
             const targetDateElement = document.querySelector(`[data-date="${targetDate}"]`);
             if (targetDateElement) {
               targetDateElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }
-        }, 500); // Aumentamos el delay para asegurar que los eventos se hayan renderizado
+        }, 500);
       } else {
-        // Si no hay eventId específico, solo navegamos a la fecha
         setTimeout(() => {
           const targetDateElement = document.querySelector(`[data-date="${targetDate}"]`);
           if (targetDateElement) {
@@ -137,64 +122,35 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
         }, 100);
       }
     }
-  }, [targetDate, targetType, targetEventId, events]); // Añadimos events como dependencia
-
-
-
-  // Handler para pegar con Ctrl+V SOLO si el modal está abierto y es nuevo (no edición)
+  }, [targetDate, targetType, targetEventId, events]);
   useEffect(() => {
     function handlePaste(e: KeyboardEvent) {
-      if (
-        e.ctrlKey &&
-        e.key === 'v' &&
-        isModalOpen &&
-        selectedDate &&
-        selectedTime
-      ) {
+      if (e.ctrlKey && e.key === 'v' && isModalOpen && selectedDate && selectedTime) {
         const clipboard = window.localStorage.getItem(clipboardKey);
         if (!clipboard) return;
         try {
-          // const data = JSON.parse(clipboard);
-          // console.log("Pasted data:", data);
-          
-          // El modal detectará automáticamente los datos pegados
-          
+          // The modal will automatically detect pasted data
         } catch (err) {
-          console.error('Error al pegar el evento:', err);
-          alert('Error al pegar el evento.');
+          console.error('Error pasting event:', err);
+          alert('Error pasting event.');
         }
       }
     }
     window.addEventListener('keydown', handlePaste);
     return () => window.removeEventListener('keydown', handlePaste);
-  }, [isModalOpen, selectedDate, selectedTime]);
+  }, [isModalOpen, selectedDate, selectedTime, clipboardKey]);
 
-  // const getDefaultEndTime = (startTime: string, hours: number) => {
-  //   if (!startTime) return "";
-  //   const [hoursStart, minutes] = startTime.split(":").map(Number);
-  //   let endHours = hoursStart + hours;
-  //   if (endHours >= 24) endHours = 23;
-  //   return `${endHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-  // };
 
   const handleDateSelect = (selectInfo: any) => {
     try {
-      // console.log("Date select triggered:", selectInfo);
-      
       if (!selectInfo || !selectInfo.start) {
         console.error("Invalid select info");
         return;
       }
 
       const start = selectInfo.start;
-      
-      // Format date as YYYY-MM-DD
       const dateStr = start.toISOString().split('T')[0];
-      
-      // Format time as HH:mm
       const timeStr = start.toTimeString().slice(0, 5);
-      
-      // console.log("Selected date:", dateStr, "time:", timeStr);
       
       setSelectedDate(dateStr);
       setSelectedTime(timeStr);
@@ -207,11 +163,60 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
 
 
+  /**
+   * Updates the visual state of a checkbox when selection changes
+   */
+  const updateCheckbox = (eventId: string, isSelected: boolean) => {
+    const eventElement = document.querySelector(`[data-event-id="${eventId}"]`);
+    if (eventElement) {
+      const checkbox = eventElement.querySelector('.selection-checkbox') as HTMLElement;
+      if (checkbox) {
+        checkbox.style.background = isSelected ? '#3b82f6' : 'white';
+        checkbox.style.borderColor = isSelected ? '#3b82f6' : '#9ca3af';
+        checkbox.style.opacity = '1';
+        checkbox.innerHTML = isSelected ? '✓' : '';
+      }
+      
+      // Update outline
+      const eventEl = eventElement as HTMLElement;
+      if (isSelected) {
+        eventEl.style.outline = '3px solid #3b82f6';
+        eventEl.style.outlineOffset = '-3px';
+      } else {
+        eventEl.style.outline = '';
+        eventEl.style.outlineOffset = '';
+      }
+    }
+  };
+
   const handleEventClick = (clickInfo: any) => {
     try {
-      // console.log("Event clicked:", clickInfo.event);
-      
-      // Preparar los datos del evento para el modal de edición
+      // Check if the click was on the checkbox
+      const clickedElement = (clickInfo.jsEvent.target as HTMLElement);
+      const isCheckboxClick = clickedElement.classList.contains('selection-checkbox') || 
+                             clickedElement.closest('.selection-checkbox');
+
+      // If clicking checkbox, toggle selection
+      if (isCheckboxClick) {
+        clickInfo.jsEvent.preventDefault();
+        clickInfo.jsEvent.stopPropagation();
+        
+        const eventId = clickInfo.event.id;
+        const newSelected = new Set(selectedEventIds);
+        const isNowSelected = !newSelected.has(eventId);
+        
+        if (newSelected.has(eventId)) {
+          newSelected.delete(eventId);
+        } else {
+          newSelected.add(eventId);
+        }
+        setSelectedEventIds(newSelected);
+        
+        // Update checkbox immediately
+        updateCheckbox(eventId, isNowSelected);
+        return;
+      }
+
       const eventData = {
         _id: clickInfo.event.id,
         title: clickInfo.event.title,
@@ -231,9 +236,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
         }
       };
       
-      // console.log("Prepared event data:", eventData);
-      
-      // Abrir modal de edición con los datos del evento
       setSelectedEvent(eventData);
       setIsEditModalOpen(true);
     } catch (error) {
@@ -243,7 +245,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
   const handleScheduleCreated = () => {
     try {
-      // console.log("Schedule created, refreshing events");
       fetchEvents();
     } catch (error) {
       console.error("Error refreshing events:", error);
@@ -251,7 +252,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
   };
 
   const handleModalClose = () => {
-    // console.log("Closing modal");
     setIsModalOpen(false);
     setSelectedDate("");
     setSelectedTime("");
@@ -264,8 +264,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
   const handleEventDelete = async (eventId: string) => {
     try {
-      // console.log("Sending delete request for event:", eventId);
-      
       const response = await fetch(`/api/driving-test-lessons/delete-event`, {
         method: 'DELETE',
         headers: {
@@ -275,9 +273,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
       });
 
       if (response.ok) {
-        // console.log("Event deleted successfully");
         handleEditModalClose();
-        fetchEvents(); // Refrescar eventos
+        fetchEvents();
       } else {
         const error = await response.json();
         console.error("Delete failed:", error);
@@ -291,8 +288,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
   const handleEventUpdate = async (eventData: any) => {
     try {
-      // console.log("Sending update request:", eventData);
-      
       const response = await fetch(`/api/driving-test-lessons/update-event`, {
         method: 'PUT',
         headers: {
@@ -302,9 +297,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
       });
 
       if (response.ok) {
-        // console.log("Event updated successfully");
         handleEditModalClose();
-        fetchEvents(); // Refrescar eventos
+        fetchEvents();
       } else {
         const error = await response.json();
         console.error("Update failed:", error);
@@ -318,8 +312,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
   const handleEventCopy = async (eventData: any) => {
     try {
-      // console.log("Sending copy request:", eventData);
-      
       const response = await fetch(`/api/driving-test-lessons/copy-event`, {
         method: 'POST',
         headers: {
@@ -329,9 +321,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
       });
 
       if (response.ok) {
-        // console.log("Event copied successfully");
         handleEditModalClose();
-        fetchEvents(); // Refrescar eventos
+        fetchEvents();
         alert("Event copied successfully!");
       } else {
         const error = await response.json();
@@ -341,6 +332,50 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
     } catch (error) {
       console.error("Error copying event:", error);
       alert("Error copying event");
+    }
+  };
+
+  const handleSelectAll = () => {
+    const allIds = new Set(events.map(event => event.id).filter(Boolean) as string[]);
+    setSelectedEventIds(allIds);
+    
+    // Update all checkboxes
+    setTimeout(() => {
+      allIds.forEach(id => updateCheckbox(id, true));
+    }, 0);
+  };
+
+  const handleDeselectAll = () => {
+    const previousIds = Array.from(selectedEventIds);
+    setSelectedEventIds(new Set());
+    
+    // Update all checkboxes
+    setTimeout(() => {
+      previousIds.forEach(id => updateCheckbox(id, false));
+    }, 0);
+  };
+
+  const handleDeleteSelected = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      // Delete all selected events
+      await Promise.all(
+        Array.from(selectedEventIds).map(id => 
+          fetch(`/api/driving-test-lessons/delete-event`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ eventId: id })
+          })
+        )
+      );
+
+      setSelectedEventIds(new Set());
+      await fetchEvents();
+    } catch (error) {
+      console.error('Error deleting selected events:', error);
+      alert(`Error deleting events: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -602,20 +637,79 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             eventClick={handleEventClick}
             eventContent={renderEventContent}
             eventDidMount={(info) => {
-              // Calcular duración y agregar atributo data-duration para CSS
+              if (info.event.id) {
+                info.el.setAttribute('data-event-id', info.event.id);
+              }
+
+              // Set duration attribute for CSS styling
               if (info.event.start && info.event.end) {
                 const startTime = new Date(info.event.start);
                 const endTime = new Date(info.event.end);
                 const durationMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
                 
-                // Agregar atributo data-duration al elemento del evento
                 info.el.setAttribute('data-duration', durationMinutes.toString());
                 
-                // También agregar al harness para que el CSS funcione correctamente
                 const harness = info.el.closest('.fc-timegrid-event-harness');
                 if (harness) {
                   harness.setAttribute('data-duration', durationMinutes.toString());
                 }
+              }
+
+              // Add selection checkbox
+              const eventId = info.event.id;
+              const isSelected = eventId && selectedEventIds.has(eventId);
+
+              if (!info.el.querySelector('.selection-checkbox')) {
+                const checkbox = document.createElement('div');
+                checkbox.className = 'selection-checkbox';
+                checkbox.setAttribute('data-event-id', eventId || '');
+                checkbox.style.cssText = `
+                  position: absolute;
+                  top: 4px;
+                  left: 4px;
+                  width: 20px;
+                  height: 20px;
+                  background: ${isSelected ? '#3b82f6' : 'white'};
+                  border: 2px solid ${isSelected ? '#3b82f6' : '#9ca3af'};
+                  border-radius: 4px;
+                  z-index: 100;
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 13px;
+                  font-weight: bold;
+                  color: white;
+                  opacity: ${isSelected ? '1' : '0'};
+                  transition: opacity 0.2s ease;
+                  pointer-events: auto;
+                `;
+                if (isSelected) {
+                  checkbox.innerHTML = '✓';
+                }
+                info.el.style.position = 'relative';
+                info.el.appendChild(checkbox);
+                
+                // Show checkbox on hover
+                info.el.addEventListener('mouseenter', () => {
+                  const cb = info.el.querySelector('.selection-checkbox') as HTMLElement;
+                  if (cb) {
+                    cb.style.opacity = '1';
+                  }
+                });
+                
+                info.el.addEventListener('mouseleave', () => {
+                  const cb = info.el.querySelector('.selection-checkbox') as HTMLElement;
+                  if (cb && !isSelected) {
+                    cb.style.opacity = '0';
+                  }
+                });
+              }
+
+              // Apply selection styles
+              if (isSelected) {
+                info.el.style.outline = '3px solid #3b82f6';
+                info.el.style.outlineOffset = '-3px';
               }
             }}
             height="900px"
@@ -632,6 +726,62 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             eventInteractive={true}
           />
         </div>
+
+        {/* Selection Action Bar */}
+        {selectedEventIds.size > 0 && (
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white shadow-2xl rounded-lg border border-gray-200 px-6 py-4 flex items-center gap-4">
+            <span className="text-sm font-medium text-gray-700">
+              {selectedEventIds.size} {selectedEventIds.size === 1 ? 'event' : 'events'} selected
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSelectAll}
+                className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md transition-colors"
+              >
+                Select All
+              </button>
+              <button
+                onClick={handleDeselectAll}
+                className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Deselect All
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-3 py-1.5 text-sm bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors"
+              >
+                Delete Selected
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Selected Events</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Are you sure you want to delete {selectedEventIds.size} selected {selectedEventIds.size === 1 ? 'event' : 'events'}?
+                This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         <ScheduleModal
           isOpen={isModalOpen}

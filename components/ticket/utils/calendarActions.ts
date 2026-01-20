@@ -38,10 +38,13 @@ export const saveTicketClass = async (data: TicketFormData): Promise<void> => {
 const createRecurringClasses = async (data: TicketFormData): Promise<void> => {
   const startDate = new Date(data.date);
   const endDate = new Date(data.recurrenceEndDate!);
-  const step = data.recurrence === 'daily' ? 1 : data.recurrence === 'weekly' ? 7 : 30;
   const payload: any[] = [];
 
-  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + step)) {
+  // Guardar el día de la semana original para recurrencia semanal
+  const originalDayOfWeek = startDate.getDay();
+
+  const d = new Date(startDate);
+  while (d <= endDate) {
     payload.push({
       date: d.toISOString().split('T')[0],
       hour: data.hour,
@@ -54,6 +57,23 @@ const createRecurringClasses = async (data: TicketFormData): Promise<void> => {
       duration: data.duration,
       studentRequests: data.studentRequests || [],
     });
+
+    // Avanzar a la siguiente fecha según el tipo de recurrencia
+    if (data.recurrence === 'daily') {
+      d.setDate(d.getDate() + 1);
+    } else if (data.recurrence === 'weekly') {
+      // Sumar 7 días
+      d.setDate(d.getDate() + 7);
+
+      // Verificar que sigue siendo el mismo día de la semana
+      if (d.getDay() !== originalDayOfWeek) {
+        const dayDifference = originalDayOfWeek - d.getDay();
+        d.setDate(d.getDate() + dayDifference);
+      }
+    } else if (data.recurrence === 'monthly') {
+      // Para mensual, usar setMonth en vez de sumar 30 días
+      d.setMonth(d.getMonth() + 1);
+    }
   }
 
   const response = await fetch('/api/ticket/classes/batch', {

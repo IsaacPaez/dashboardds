@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Handle change stream events
-    changeStream.on('change', async (change) => {
+    changeStream.on('change', async () => {
       try {
         const inactiveSessions = await getInactiveSessions();
         sendToAllClients({ inactiveSessions });
@@ -58,11 +58,22 @@ export async function GET(request: NextRequest) {
     const stream = new ReadableStream({
       start(controller) {
         inactiveConnections.add(controller);
-        
+
         // Send initial data
         getInactiveSessions().then(inactiveSessions => {
-          const message = `data: ${JSON.stringify({ inactiveSessions })}\n\n`;
-          controller.enqueue(new TextEncoder().encode(message));
+          try {
+            // Check if controller is still open before enqueuing
+            if (!request.signal.aborted) {
+              const message = `data: ${JSON.stringify({ inactiveSessions })}\n\n`;
+              controller.enqueue(new TextEncoder().encode(message));
+            }
+          } catch (error) {
+            // Connection was closed, clean up
+            inactiveConnections.delete(controller);
+          }
+        }).catch(error => {
+          console.error('Error fetching initial inactive sessions:', error);
+          inactiveConnections.delete(controller);
         });
 
         // No enviar keep-alive automático - solo datos reales cuando cambien
@@ -72,6 +83,11 @@ export async function GET(request: NextRequest) {
         request.signal.addEventListener('abort', () => {
           inactiveConnections.delete(controller);
           changeStream.close();
+          try {
+            controller.close();
+          } catch (error) {
+            // Controller already closed, ignore
+          }
         });
       }
     });

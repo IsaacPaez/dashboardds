@@ -5,9 +5,9 @@ import dbConnect from "@/lib/dbConnect";
 export async function GET() {
   try {
     await dbConnect();
-    
+
     const phones = await Phone.find({});
-    
+
     return NextResponse.json({
       success: true,
       phones: phones.map(phone => ({
@@ -30,6 +30,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
+
     const data = await req.json();
 
     if (!data.phoneNumber) {

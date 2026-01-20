@@ -20,8 +20,9 @@ import ImageUpload from "../custom ui/ImageUpload";
 import TipTapEditor from "../custom ui/TipTapEditor";
 import toast from "react-hot-toast";
 import Select from "react-select"; // 📌 Librería para Select
-import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-import { useRef } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
+import LocationInput from "../custom ui/LocationInput"; // 📌 Nuevo componente
+// import { useRef } from "react"; // Ya no se usa para Autocomplete
 import Link from "next/link";
 
 // Configurar la API de Google Maps
@@ -119,22 +120,9 @@ const LocationsForm: React.FC<LocationsFormProps> = ({ initialData }) => {
     setSelectAll(!selectAll);
   };
 
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null); // 📌 Define la referencia
-
-  const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    autocompleteRef.current = autocomplete; // ✅ Guarda la referencia de Autocomplete
-  };
-
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-
-      if (place?.formatted_address) {
-        form.setValue("zone", place.formatted_address); // Asigna el valor al formulario
-      } else {
-        toast.error("Please select a valid address from the dropdown.");
-      }
-    }
+  // 📌 Integración con LocationInput usando el nuevo Places API
+  const handlePlaceSelect = (address: string) => {
+    form.setValue("zone", address);
   };
 
   const onSubmit = async (values: FormData) => {
@@ -212,12 +200,10 @@ const LocationsForm: React.FC<LocationsFormProps> = ({ initialData }) => {
                 <FormLabel>Zone</FormLabel>
                 <FormControl>
                   {isLoaded ? (
-                    <Autocomplete
-                      onLoad={onLoad}
-                      onPlaceChanged={onPlaceChanged}
-                    >
-                      <Input {...field} placeholder="Enter a location" />
-                    </Autocomplete>
+                    <LocationInput
+                      onPlaceSelect={handlePlaceSelect}
+                      defaultValue={field.value}
+                    />
                   ) : (
                     <p>Loading...</p>
                   )}

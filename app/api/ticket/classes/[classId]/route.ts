@@ -248,8 +248,32 @@ export async function PUT(
       duration: body.duration || ticketClass.duration,
       status: body.status || ticketClass.status,
       // Asegurar que students y studentRequests sean arrays válidos
-      students: Array.isArray(body.students) ? body.students.filter((s: unknown) => typeof s === 'string') : ticketClass.students || [],
-      studentRequests: Array.isArray(body.studentRequests) ? body.studentRequests.filter((req: unknown) => typeof req === 'string') : ticketClass.studentRequests || []
+      students: Array.isArray(body.students) 
+        ? body.students.map((s: unknown) => {
+            // Si es un string (ID simple), convertir a objeto con studentId
+            if (typeof s === 'string') {
+              return { studentId: s };
+            }
+            // Si ya es un objeto, verificar que tenga studentId
+            if (typeof s === 'object' && s !== null) {
+              return s;
+            }
+            return null;
+          }).filter(Boolean)
+        : ticketClass.students || [],
+      studentRequests: Array.isArray(body.studentRequests) 
+        ? body.studentRequests.map((req: unknown) => {
+            // Si es un string (ID simple), convertir a objeto con studentId
+            if (typeof req === 'string') {
+              return { studentId: req, requestDate: new Date(), status: 'pending' };
+            }
+            // Si ya es un objeto, verificar que tenga studentId
+            if (typeof req === 'object' && req !== null) {
+              return req;
+            }
+            return null;
+          }).filter(Boolean)
+        : ticketClass.studentRequests || []
     };
 
     // Actualizar la clase

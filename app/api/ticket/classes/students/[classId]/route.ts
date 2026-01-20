@@ -4,7 +4,7 @@ import Order from "@/lib/models/Order";
 import Payment from "@/lib/models/Payments";
 import TicketClass from "@/lib/models/TicketClass";
 // import Location from "../../../../../../lib/models/Locations";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 import { NextRequest, NextResponse } from "next/server";
 
 // interface Student {
@@ -27,7 +27,16 @@ import { NextRequest, NextResponse } from "next/server";
 // }
 
 export async function GET(req: NextRequest) {
-  await connectToDB();
+  try {
+    await dbConnect();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      { success: false, message: "Database connection error", error: String(error) },
+      { status: 500 }
+    );
+  }
+  
   const classId = req.url.split("/").pop();
   
   const ticketClass = await TicketClass.findById(classId).exec();
@@ -57,13 +66,23 @@ export async function GET(req: NextRequest) {
   const studentsArray = Array.isArray(ticketClass.students) ? ticketClass.students : [];
   
   for (const studentEntry of studentsArray) {
-    // Handle both cases: direct ID strings or ObjectId
+    // Handle both cases: direct ID strings or enrollment objects
     let studentId;
     if (typeof studentEntry === 'string') {
       studentId = studentEntry;
     } else if (studentEntry && typeof studentEntry === 'object') {
-      // If it's an ObjectId, convert it to string
-      studentId = studentEntry.toString();
+      // If it's an enrollment object with studentId field, extract it
+      if ('studentId' in studentEntry && studentEntry.studentId) {
+        studentId = studentEntry.studentId;
+      } else {
+        // Last resort: try toString on the object itself
+        studentId = studentEntry;
+      }
+      
+      // Convert ObjectId to string if needed
+      if (studentId && typeof studentId === 'object' && studentId.toString) {
+        studentId = studentId.toString();
+      }
     } else {
       continue;
     }
@@ -141,7 +160,7 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    await connectToDB();
+    await dbConnect();
     const classId = req.url.split("/").pop();
     const body = await req.json();
     const { id, certn, payedAmount, paymentMethod, citation_number, ...dynamicFields } = body;

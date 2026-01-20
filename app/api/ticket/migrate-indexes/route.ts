@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 import TicketClass from "@/lib/models/TicketClass";
 
 export async function GET() {
   try {
-    await connectToDB();
+    await dbConnect();
 
 
     // Get the collection

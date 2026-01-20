@@ -121,6 +121,30 @@ export async function POST(req: Request) {
       return NextResponse.json(newPageContent, { status: 201 });
     }
 
+    // Para driving test, solo validar drivingTestPage
+    if (body.pageType === "drivingTest") {
+      console.log("🚗 Processing driving test page");
+      if (!body.drivingTestPage) {
+        console.log("❌ Missing drivingTestPage");
+        return NextResponse.json(
+          { message: "drivingTestPage is required for drivingTest pageType" },
+          { status: 400 }
+        );
+      }
+      
+      console.log("💾 Creating new driving test page content:", body.drivingTestPage);
+      const newPageContent = new PageContent({
+        pageType: body.pageType,
+        drivingTestPage: body.drivingTestPage,
+        isActive: body.isActive ?? true,
+        order: body.order ?? 0,
+      });
+
+      await newPageContent.save();
+      console.log("✅ Saved successfully:", newPageContent._id);
+      return NextResponse.json(newPageContent, { status: 201 });
+    }
+
     // Para otros tipos, validar campos tradicionales
     if (!body.title || !body.description || !body.backgroundImage) {
       return NextResponse.json(

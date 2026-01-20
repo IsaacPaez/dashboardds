@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import ImageUpload from "../custom ui/ImageUpload";
 import TipTapEditor from "../custom ui/TipTapEditor";
+import ReasonsManager from "./ReasonsManager";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import Select, { MultiValue, ActionMeta } from "react-select";
@@ -35,6 +36,7 @@ const formSchema = z.object({
   image: z.string().optional(),
   headquarters: z.array(z.string()).min(1, "Please select at least one headquarters"),
   classType: z.string().default("date"),
+  reasons: z.array(z.string()).default([]), // Enrollment reasons
 });
 
 interface FormProps {
@@ -51,6 +53,7 @@ interface FormProps {
     image?: string;
     headquarters?: string[];
     classType?: string;
+    reasons?: string[]; // Enrollment reasons
   } | null;
 }
 
@@ -160,7 +163,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData?.title || "",
-      alsoKnownAs: initialData?.alsoKnownAs || "", // Deprecated  
+      alsoKnownAs: initialData?.alsoKnownAs || "", // Deprecated
       length: initialData?.length ?? 1,
       price: initialData?.price ?? 0.1,
       overview: initialData?.overview || "", // Deprecated
@@ -170,6 +173,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
       image: initialData?.image || "",
       headquarters: initialData?.headquarters ?? [],
       classType: initialData?.classType ?? "date",
+      reasons: initialData?.reasons ?? [],
     },
   });
 
@@ -218,6 +222,7 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
         image: initialData.image || "",
         headquarters: initialData.headquarters || [],
         classType: initialData.classType || "date",
+        reasons: initialData.reasons || [],
       });
     }
   }, [initialData, originalData]);
@@ -554,6 +559,23 @@ const CustomForm: React.FC<FormProps> = ({ initialData }) => {
           {/* Hidden deprecated fields - DO NOT DELETE (kept for backward compatibility) */}
           <input type="hidden" {...form.register("alsoKnownAs")} />
           <input type="hidden" {...form.register("overview")} />
+
+          {/* 🔹 ENROLLMENT REASONS */}
+          <FormField
+            control={form.control}
+            name="reasons"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ReasonsManager
+                    reasons={field.value || []}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* 🔹 HEADQUARTERS */}
           <FormItem>

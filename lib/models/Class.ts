@@ -13,6 +13,7 @@ export interface IDrivingClass extends Document {
   headquarters: string[];
   classType?: string;
   duration?: "standard" | "4h" | "8h" | "agressive" | "12h";
+  reasons?: string[]; // Enrollment reasons for this class
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -37,6 +38,7 @@ const DrivingClassSchema: Schema = new Schema({
     enum: ["standard", "4h", "8h", "agressive", "12h"],
     default: "standard",
   },
+  reasons: { type: [String], default: [] }, // Enrollment reasons for this class
 }, { timestamps: true });
 
 const DrivingClass: Model<IDrivingClass> = mongoose.models.DrivingClass || mongoose.model<IDrivingClass>("DrivingClass", DrivingClassSchema);

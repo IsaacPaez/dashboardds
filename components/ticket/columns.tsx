@@ -105,4 +105,12 @@ export const columns: ColumnDef<Student>[] = [
       return attendanceReason || "-";
     },
   },
+  {
+    accessorKey: "reason",
+    header: "Enrollment Reason",
+    cell: ({ row }) => {
+      const reason = row.getValue("reason") as string;
+      return reason || "-";
+    },
+  },
 ];

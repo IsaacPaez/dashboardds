@@ -122,6 +122,10 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
         title: "",
         description: "",
       },
+      onlineCoursesPage: {
+        title: "",
+        description: "",
+      },
       isActive: true,
       order: 0,
     },
@@ -200,6 +204,12 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               description: "",
             };
 
+            // Handle onlineCoursesPage defaults
+            const onlineCoursesPage = data.onlineCoursesPage || {
+              title: "",
+              description: "",
+            };
+
             form.reset({
               ...data,
               featureSection: data.featureSection || {
@@ -223,6 +233,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               areasWeServe,
               lessonsPage,
               classesPage,
+              onlineCoursesPage,
             });
           } else {
             const errorData = await res.json();
@@ -267,6 +278,15 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           order: values.order,
         };
         console.log("📦 Classes payload:", payload);
+      } else if (values.pageType === "onlineCourses") {
+        // For online courses page, only send onlineCourses-specific data
+        payload = {
+          pageType: values.pageType,
+          onlineCoursesPage: values.onlineCoursesPage,
+          isActive: values.isActive,
+          order: values.order,
+        };
+        console.log("📦 Online Courses payload:", payload);
       } else {
         // For other pages, use the original cleanup logic
         payload = { ...values };
@@ -396,6 +416,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
                     <SelectItem value="contact">Contact</SelectItem>
                     <SelectItem value="lessons">Lessons</SelectItem>
                     <SelectItem value="classes">Classes</SelectItem>
+                    <SelectItem value="onlineCourses">Online Courses</SelectItem>
                     <SelectItem value="custom">Custom</SelectItem>
                   </SelectContent>
                 </Select>
@@ -405,7 +426,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           />
 
           {/* Modular Sections - Show based on pageType */}
-          {form.watch("pageType") !== "lessons" && form.watch("pageType") !== "classes" && (
+          {form.watch("pageType") !== "lessons" && form.watch("pageType") !== "classes" && form.watch("pageType") !== "onlineCourses" && (
             <>
               <HeroSection {...sectionProps} />
               <FeatureSection {...sectionProps} />
@@ -452,6 +473,54 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
                           {...field}
                           value={field.value || ""}
                           placeholder="Enter description for classes page" 
+                          rows={5}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <FormDescription>Brief description that appears below the title</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Online Courses Page Section */}
+          {form.watch("pageType") === "onlineCourses" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Online Courses Page Content</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Title */}
+                <FormField
+                  control={form.control}
+                  name="onlineCoursesPage.title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Page Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="e.g., Online Driving Courses" />
+                      </FormControl>
+                      <FormDescription>Main heading for the online courses page</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Description */}
+                <FormField
+                  control={form.control}
+                  name="onlineCoursesPage.description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="Enter description for online courses page" 
                           rows={5}
                           className="resize-none"
                         />

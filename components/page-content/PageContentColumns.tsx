@@ -133,6 +133,21 @@ export const columns: ColumnDef<PageContentType>[] = [
         );
       }
       
+      // For online courses type, get title from onlineCoursesPage
+      if (row.original.pageType === "onlineCourses") {
+        const title = row.original.onlineCoursesPage?.title || "Online Courses";
+        
+        return (
+          <Link
+            href={`/page-content/${row.original._id}`}
+            className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
+          >
+            <span className="font-semibold text-blue-500">{title}</span>
+            <ArrowUpRight size={16} className="opacity-75" />
+          </Link>
+        );
+      }
+      
       // For other types, use default title
       const titlePart1 = row.original.title?.part1 || "Untitled";
       const titlePart2 = row.original.title?.part2 || "";

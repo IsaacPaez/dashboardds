@@ -120,9 +120,14 @@ export const classesPageSchema = z.object({
   description: z.string().max(2000).default(""),
 }).optional();
 
+export const onlineCoursesPageSchema = z.object({
+  title: z.string().max(200).default(""),
+  description: z.string().max(2000).default(""),
+}).optional();
+
 // Main schema with conditional validation
 export const pageContentSchema = z.object({
-  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons", "classes"]),
+  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons", "classes", "onlineCourses"]),
   title: titleSchema.optional(),
   description: z.string().max(1000).optional(),
   statistics: z.array(statisticSchema).max(10).optional(),
@@ -136,6 +141,7 @@ export const pageContentSchema = z.object({
   areasWeServe: areasWeServeSchema,
   lessonsPage: lessonsPageSchema,
   classesPage: classesPageSchema,
+  onlineCoursesPage: onlineCoursesPageSchema,
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 }).superRefine((data, ctx) => {
@@ -239,7 +245,40 @@ export const pageContentSchema = z.object({
     return; // Skip home validation for classes
   }
   
-  // Validate home page fields when pageType is NOT "lessons" or "classes"
+  // Validate online courses page fields when pageType is "onlineCourses"
+  if (data.pageType === "onlineCourses") {
+    console.log("🔍 Validating online courses page:", data.onlineCoursesPage);
+    
+    if (!data.onlineCoursesPage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Online courses page content is required",
+        path: ["onlineCoursesPage"],
+      });
+      return;
+    }
+    
+    if (!data.onlineCoursesPage.title || data.onlineCoursesPage.title.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Title is required",
+        path: ["onlineCoursesPage", "title"],
+      });
+    }
+    
+    if (!data.onlineCoursesPage.description || data.onlineCoursesPage.description.trim() === "" || data.onlineCoursesPage.description.trim().length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Description is required (minimum 10 characters)",
+        path: ["onlineCoursesPage", "description"],
+      });
+    }
+    
+    console.log("✅ Online Courses validation passed");
+    return; // Skip home validation for online courses
+  }
+  
+  // Validate home page fields when pageType is NOT "lessons", "classes", or "onlineCourses"
   if (!data.description || data.description.trim().length < 10) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

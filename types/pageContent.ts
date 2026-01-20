@@ -87,7 +87,12 @@ export interface ClassesPageContent {
   description: string;
 }
 
-export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "classes" | "custom";
+export interface OnlineCoursesPageContent {
+  title: string;
+  description: string;
+}
+
+export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "classes" | "onlineCourses" | "custom";
 
 export interface PageContentType {
   _id: string;
@@ -120,6 +125,7 @@ export interface PageContentFormData {
   corporateProgramsSection?: CorporateProgramsSection;
   lessonsPage?: LessonsPageContent;
   classesPage?: ClassesPageContent;
+  onlineCoursesPage?: OnlineCoursesPageContent;
   isActive: boolean;
   order: number;
 }

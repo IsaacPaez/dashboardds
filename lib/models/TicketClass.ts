@@ -1,5 +1,21 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+export interface IStudentRequest {
+  _id?: Schema.Types.ObjectId;
+  studentId: Schema.Types.ObjectId;
+  requestDate: Date;
+  status: 'pending' | 'accepted' | 'rejected';
+  paymentMethod?: 'online' | 'local';
+}
+
+export interface IStudentEnrollment {
+  studentId: Schema.Types.ObjectId;
+  reason?: string;
+  citation_number?: string;
+  citation_ticket?: string;
+  course_country?: string;
+}
+
 export interface ITicketClass extends Document {
   locationId: Schema.Types.ObjectId;
   date: Date;
@@ -8,10 +24,10 @@ export interface ITicketClass extends Document {
   classId: Schema.Types.ObjectId;
   type: string;
   duration: string;
-  students: Schema.Types.ObjectId[];
+  students: IStudentEnrollment[];
   spots?: number;
   status?: "available" | "cancel" | "full" | "expired";
-  studentRequests: Schema.Types.ObjectId[];
+  studentRequests: IStudentRequest[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -49,8 +65,11 @@ const TicketClassSchema: Schema = new Schema({
     required: true,
   },
   students: [{
-    type: Schema.Types.ObjectId,
-    ref: "User",
+    studentId: { type: Schema.Types.ObjectId, ref: "User" },
+    reason: { type: String },
+    citation_number: { type: String },
+    citation_ticket: { type: String },
+    course_country: { type: String },
   }],
   spots: {
     type: Number,
@@ -64,8 +83,10 @@ const TicketClassSchema: Schema = new Schema({
     required: true,
   },
   studentRequests: [{
-    type: Schema.Types.ObjectId,
-    ref: "User",
+    studentId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    requestDate: { type: Date, default: Date.now },
+    status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
+    paymentMethod: { type: String, enum: ['online', 'local'] },
   }],
 }, { timestamps: true });
 

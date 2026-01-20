@@ -92,24 +92,37 @@ export async function PATCH(
 
     if (action === 'acceptRequest') {
       // Move student from studentRequests to students array
-      if (!ticketClass.studentRequests || !ticketClass.studentRequests.includes(studentId)) {
+      // studentRequests is an array of objects with { studentId, requestDate, status, paymentMethod }
+      const requestIndex = ticketClass.studentRequests?.findIndex(
+        (req: any) => req.studentId?.toString() === studentId || req._id?.toString() === requestId
+      );
+
+      if (requestIndex === undefined || requestIndex === -1) {
         return NextResponse.json(
           { success: false, message: "Student request not found" },
           { status: 404 }
         );
       }
 
-      // Remove from studentRequests
-      ticketClass.studentRequests = ticketClass.studentRequests.filter(
-        (id: any) => id.toString() !== studentId
-      );
+      // Get the request before removing it
+      const acceptedRequest = ticketClass.studentRequests[requestIndex];
+      const acceptedStudentId = acceptedRequest.studentId?.toString() || studentId;
 
-      // Add to students
+      // Remove from studentRequests
+      ticketClass.studentRequests.splice(requestIndex, 1);
+
+      // Add to students array (as an object with studentId)
       if (!ticketClass.students) {
         ticketClass.students = [];
       }
-      if (!ticketClass.students.includes(studentId)) {
-        ticketClass.students.push(studentId);
+
+      // Check if student is already enrolled
+      const alreadyEnrolled = ticketClass.students.some(
+        (s: any) => s.studentId?.toString() === acceptedStudentId || s.toString() === acceptedStudentId
+      );
+
+      if (!alreadyEnrolled) {
+        ticketClass.students.push({ studentId: acceptedStudentId });
       }
 
       await ticketClass.save();
@@ -129,16 +142,20 @@ export async function PATCH(
 
     } else if (action === 'rejectRequest') {
       // Remove student from studentRequests
-      if (!ticketClass.studentRequests || !ticketClass.studentRequests.includes(studentId)) {
+      // studentRequests is an array of objects with { studentId, requestDate, status, paymentMethod }
+      const requestIndex = ticketClass.studentRequests?.findIndex(
+        (req: any) => req.studentId?.toString() === studentId || req._id?.toString() === requestId
+      );
+
+      if (requestIndex === undefined || requestIndex === -1) {
         return NextResponse.json(
           { success: false, message: "Student request not found" },
           { status: 404 }
         );
       }
 
-      ticketClass.studentRequests = ticketClass.studentRequests.filter(
-        (id: any) => id.toString() !== studentId
-      );
+      // Remove from studentRequests
+      ticketClass.studentRequests.splice(requestIndex, 1);
 
       await ticketClass.save();
 

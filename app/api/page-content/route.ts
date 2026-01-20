@@ -97,6 +97,30 @@ export async function POST(req: Request) {
       return NextResponse.json(newPageContent, { status: 201 });
     }
 
+    // Para online courses, solo validar onlineCoursesPage
+    if (body.pageType === "onlineCourses") {
+      console.log("💻 Processing online courses page");
+      if (!body.onlineCoursesPage) {
+        console.log("❌ Missing onlineCoursesPage");
+        return NextResponse.json(
+          { message: "onlineCoursesPage is required for onlineCourses pageType" },
+          { status: 400 }
+        );
+      }
+      
+      console.log("💾 Creating new online courses page content:", body.onlineCoursesPage);
+      const newPageContent = new PageContent({
+        pageType: body.pageType,
+        onlineCoursesPage: body.onlineCoursesPage,
+        isActive: body.isActive ?? true,
+        order: body.order ?? 0,
+      });
+
+      await newPageContent.save();
+      console.log("✅ Saved successfully:", newPageContent._id);
+      return NextResponse.json(newPageContent, { status: 201 });
+    }
+
     // Para otros tipos, validar campos tradicionales
     if (!body.title || !body.description || !body.backgroundImage) {
       return NextResponse.json(

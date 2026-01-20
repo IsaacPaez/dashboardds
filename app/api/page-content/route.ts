@@ -73,6 +73,30 @@ export async function POST(req: Request) {
       return NextResponse.json(newPageContent, { status: 201 });
     }
 
+    // Para classes, solo validar classesPage
+    if (body.pageType === "classes") {
+      console.log("📚 Processing classes page");
+      if (!body.classesPage) {
+        console.log("❌ Missing classesPage");
+        return NextResponse.json(
+          { message: "classesPage is required for classes pageType" },
+          { status: 400 }
+        );
+      }
+      
+      console.log("💾 Creating new classes page content:", body.classesPage);
+      const newPageContent = new PageContent({
+        pageType: body.pageType,
+        classesPage: body.classesPage,
+        isActive: body.isActive ?? true,
+        order: body.order ?? 0,
+      });
+
+      await newPageContent.save();
+      console.log("✅ Saved successfully:", newPageContent._id);
+      return NextResponse.json(newPageContent, { status: 201 });
+    }
+
     // Para otros tipos, validar campos tradicionales
     if (!body.title || !body.description || !body.backgroundImage) {
       return NextResponse.json(

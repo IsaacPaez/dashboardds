@@ -103,7 +103,7 @@ export const lessonsPageSchema = z.object({
     part3: z.string().max(100).default(""),
   }),
   description: z.string().max(2000).default(""),
-  mainImage: z.string().url("Must be a valid URL").default(""),
+  mainImage: z.string().default(""),
   cards: z.array(
     z.object({
       title: z.string().min(1, "Title is required").max(100),
@@ -115,9 +115,14 @@ export const lessonsPageSchema = z.object({
   ).max(3, "Maximum 3 cards allowed").default([]),
 }).optional();
 
+export const classesPageSchema = z.object({
+  title: z.string().max(200).default(""),
+  description: z.string().max(2000).default(""),
+}).optional();
+
 // Main schema with conditional validation
 export const pageContentSchema = z.object({
-  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons"]),
+  pageType: z.enum(["home", "about", "services", "contact", "custom", "lessons", "classes"]),
   title: titleSchema.optional(),
   description: z.string().max(1000).optional(),
   statistics: z.array(statisticSchema).max(10).optional(),
@@ -130,6 +135,7 @@ export const pageContentSchema = z.object({
   trafficCoursesSection: trafficCoursesSectionSchema,
   areasWeServe: areasWeServeSchema,
   lessonsPage: lessonsPageSchema,
+  classesPage: classesPageSchema,
   isActive: z.boolean().default(true),
   order: z.coerce.number().int().min(0).default(0),
 }).superRefine((data, ctx) => {
@@ -200,7 +206,40 @@ export const pageContentSchema = z.object({
     return; // Skip home validation for lessons
   }
   
-  // Validate home page fields when pageType is NOT "lessons"
+  // Validate classes page fields when pageType is "classes"
+  if (data.pageType === "classes") {
+    console.log("🔍 Validating classes page:", data.classesPage);
+    
+    if (!data.classesPage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Classes page content is required",
+        path: ["classesPage"],
+      });
+      return;
+    }
+    
+    if (!data.classesPage.title || data.classesPage.title.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Title is required",
+        path: ["classesPage", "title"],
+      });
+    }
+    
+    if (!data.classesPage.description || data.classesPage.description.trim() === "" || data.classesPage.description.trim().length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Description is required (minimum 10 characters)",
+        path: ["classesPage", "description"],
+      });
+    }
+    
+    console.log("✅ Classes validation passed");
+    return; // Skip home validation for classes
+  }
+  
+  // Validate home page fields when pageType is NOT "lessons" or "classes"
   if (!data.description || data.description.trim().length < 10) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

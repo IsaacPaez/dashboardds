@@ -82,7 +82,12 @@ export interface LessonsPageContent {
   cards: LessonsCard[];
 }
 
-export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "custom";
+export interface ClassesPageContent {
+  title: string;
+  description: string;
+}
+
+export type PageType = "home" | "about" | "services" | "contact" | "lessons" | "classes" | "custom";
 
 export interface PageContentType {
   _id: string;
@@ -96,6 +101,7 @@ export interface PageContentType {
   benefitsSection?: BenefitsSection;
   corporateProgramsSection?: CorporateProgramsSection;
   lessonsPage?: LessonsPageContent;
+  classesPage?: ClassesPageContent;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -113,6 +119,7 @@ export interface PageContentFormData {
   benefitsSection?: BenefitsSection;
   corporateProgramsSection?: CorporateProgramsSection;
   lessonsPage?: LessonsPageContent;
+  classesPage?: ClassesPageContent;
   isActive: boolean;
   order: number;
 }

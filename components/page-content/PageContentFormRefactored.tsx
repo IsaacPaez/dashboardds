@@ -118,6 +118,10 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
         mainImage: "",
         cards: [],
       },
+      classesPage: {
+        title: "",
+        description: "",
+      },
       isActive: true,
       order: 0,
     },
@@ -190,6 +194,12 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               cards: [],
             };
 
+            // Handle classesPage defaults
+            const classesPage = data.classesPage || {
+              title: "",
+              description: "",
+            };
+
             form.reset({
               ...data,
               featureSection: data.featureSection || {
@@ -212,6 +222,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               trafficCoursesSection,
               areasWeServe,
               lessonsPage,
+              classesPage,
             });
           } else {
             const errorData = await res.json();
@@ -231,7 +242,8 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
   }, [contentId, form, router]);
 
   const onSubmit = async (values: PageContentFormType) => {
-    console.log("🚀 Form submitted with values:", values);
+    console.log("� onSubmit called");
+    console.log("�🚀 Form submitted with values:", values);
     console.log("📋 Form errors:", form.formState.errors);
     
     try {
@@ -246,6 +258,15 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           order: values.order,
         };
         console.log("📦 Lessons payload:", payload);
+      } else if (values.pageType === "classes") {
+        // For classes page, only send classes-specific data
+        payload = {
+          pageType: values.pageType,
+          classesPage: values.classesPage,
+          isActive: values.isActive,
+          order: values.order,
+        };
+        console.log("📦 Classes payload:", payload);
       } else {
         // For other pages, use the original cleanup logic
         payload = { ...values };
@@ -346,10 +367,15 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
       <Separator className="bg-gray-300 my-4" />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
-          console.error("❌❌❌ VALIDATION ERRORS:", errors);
-          toast.error("Please fix the validation errors");
-        })} className="space-y-8">
+        <form onSubmit={form.handleSubmit(
+          onSubmit, 
+          (errors) => {
+            console.error("❌❌❌ VALIDATION ERRORS:", errors);
+            console.error("❌ All form errors:", form.formState.errors);
+            console.error("❌ Form values:", form.getValues());
+            toast.error("Please fix the validation errors");
+          }
+        )} className="space-y-8">
           {/* Page Type */}
           <FormField
             control={form.control}
@@ -369,6 +395,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
                     <SelectItem value="services">Services</SelectItem>
                     <SelectItem value="contact">Contact</SelectItem>
                     <SelectItem value="lessons">Lessons</SelectItem>
+                    <SelectItem value="classes">Classes</SelectItem>
                     <SelectItem value="custom">Custom</SelectItem>
                   </SelectContent>
                 </Select>
@@ -378,7 +405,7 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
           />
 
           {/* Modular Sections - Show based on pageType */}
-          {form.watch("pageType") !== "lessons" && (
+          {form.watch("pageType") !== "lessons" && form.watch("pageType") !== "classes" && (
             <>
               <HeroSection {...sectionProps} />
               <FeatureSection {...sectionProps} />
@@ -388,6 +415,54 @@ const PageContentFormRefactored: React.FC<PageContentFormProps> = ({ contentId }
               {/* Traffic Courses Section - Note: This one needs special handling due to cards */}
               <AreasWeServeSection {...sectionProps} />
             </>
+          )}
+
+          {/* Classes Page Section */}
+          {form.watch("pageType") === "classes" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Classes Page Content</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Title */}
+                <FormField
+                  control={form.control}
+                  name="classesPage.title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Page Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="e.g., Driving Classes" />
+                      </FormControl>
+                      <FormDescription>Main heading for the classes page</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Description */}
+                <FormField
+                  control={form.control}
+                  name="classesPage.description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="Enter description for classes page" 
+                          rows={5}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <FormDescription>Brief description that appears below the title</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
           )}
 
           {/* Lessons Page Section */}

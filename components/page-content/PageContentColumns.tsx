@@ -100,13 +100,42 @@ export const columns: ColumnDef<PageContentType>[] = [
     header: "Title",
     cell: ({ row }) => {
       // For lessons type, get title from lessonsPage
-      const titlePart1 = row.original.pageType === "lessons" 
-        ? row.original.lessonsPage?.title?.part1 || "Lessons"
-        : row.original.title?.part1 || "Untitled";
+      if (row.original.pageType === "lessons") {
+        const titlePart1 = row.original.lessonsPage?.title?.part1 || "Lessons";
+        const titlePart2 = row.original.lessonsPage?.title?.part2 || "";
+        
+        return (
+          <Link
+            href={`/page-content/${row.original._id}`}
+            className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
+          >
+            <div className="flex flex-col">
+              <span className="font-semibold text-blue-500">{titlePart1}</span>
+              {titlePart2 && <span className="text-gray-700">{titlePart2}</span>}
+            </div>
+            <ArrowUpRight size={16} className="opacity-75" />
+          </Link>
+        );
+      }
       
-      const titlePart2 = row.original.pageType === "lessons"
-        ? row.original.lessonsPage?.title?.part2 || ""
-        : row.original.title?.part2 || "";
+      // For classes type, get title from classesPage
+      if (row.original.pageType === "classes") {
+        const title = row.original.classesPage?.title || "Classes";
+        
+        return (
+          <Link
+            href={`/page-content/${row.original._id}`}
+            className="flex items-center gap-2 hover:text-blue-700 transition-colors duration-200"
+          >
+            <span className="font-semibold text-blue-500">{title}</span>
+            <ArrowUpRight size={16} className="opacity-75" />
+          </Link>
+        );
+      }
+      
+      // For other types, use default title
+      const titlePart1 = row.original.title?.part1 || "Untitled";
+      const titlePart2 = row.original.title?.part2 || "";
       
       return (
         <Link

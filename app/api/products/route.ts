@@ -56,7 +56,7 @@ export const GET = async () => {
   try {
     await connectToDB();
 
-    const products = await Product.find().sort({ createdAt: "desc" });
+    const products = await Product.find().sort({ order: 1, createdAt: "desc" });
 
     return NextResponse.json(products, { status: 200 });
   } catch (err) {

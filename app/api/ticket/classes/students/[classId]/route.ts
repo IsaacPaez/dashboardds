@@ -57,13 +57,28 @@ export async function GET(req: NextRequest) {
   const studentsArray = Array.isArray(ticketClass.students) ? ticketClass.students : [];
   
   for (const studentEntry of studentsArray) {
-    // Handle both cases: direct ID strings or ObjectId
+    // Handle both cases: direct ID strings/ObjectId or object with studentId
     let studentId;
+    let enrollmentReason = "";
+    let citationNumber = "";
+    let citationTicket = "";
+    let courseCountry = "";
+    
     if (typeof studentEntry === 'string') {
       studentId = studentEntry;
     } else if (studentEntry && typeof studentEntry === 'object') {
-      // If it's an ObjectId, convert it to string
-      studentId = studentEntry.toString();
+      // Check if it's an object with studentId property
+      if (studentEntry.studentId) {
+        studentId = studentEntry.studentId.toString();
+        // Get the reason and other fields from the enrollment object
+        enrollmentReason = studentEntry.reason || "";
+        citationNumber = studentEntry.citation_number || "";
+        citationTicket = studentEntry.citation_ticket || "";
+        courseCountry = studentEntry.course_country || "";
+      } else {
+        // If it's an ObjectId, convert it to string
+        studentId = studentEntry.toString();
+      }
     } else {
       continue;
     }
@@ -102,10 +117,10 @@ export async function GET(req: NextRequest) {
         timeZone: "UTC",
       }),
       sex: user.sex,
-      reason: "", // These fields are no longer stored in studentEntry
-      country_ticket: "",
-      course_country: "",
-      citation_number: cert?.citation_number || "", // Get from certificate data
+      reason: enrollmentReason, // Get from student enrollment object
+      country_ticket: citationTicket,
+      course_country: courseCountry,
+      citation_number: citationNumber || cert?.citation_number || "", // Get from enrollment or certificate data
       licenseNumber: user.licenseNumber,
       // Add ticket class data
       locationId: ticketClass.locationId,

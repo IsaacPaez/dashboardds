@@ -107,11 +107,14 @@ export async function PATCH(
       // Get the request before removing it
       const acceptedRequest = ticketClass.studentRequests[requestIndex];
       const acceptedStudentId = acceptedRequest.studentId?.toString() || studentId;
+      
+      // Get the reason from the request if it exists
+      const enrollmentReason = acceptedRequest.reason || undefined;
 
       // Remove from studentRequests
       ticketClass.studentRequests.splice(requestIndex, 1);
 
-      // Add to students array (as an object with studentId)
+      // Add to students array (as an object with studentId and reason if exists)
       if (!ticketClass.students) {
         ticketClass.students = [];
       }
@@ -122,7 +125,12 @@ export async function PATCH(
       );
 
       if (!alreadyEnrolled) {
-        ticketClass.students.push({ studentId: acceptedStudentId });
+        // Create student enrollment object with reason if it exists
+        const newStudent: any = { studentId: acceptedStudentId };
+        if (enrollmentReason) {
+          newStudent.reason = enrollmentReason;
+        }
+        ticketClass.students.push(newStudent);
       }
 
       await ticketClass.save();

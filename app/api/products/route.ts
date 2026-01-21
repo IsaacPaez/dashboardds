@@ -22,6 +22,7 @@ export const POST = async (req: NextRequest) => {
       duration,
       tag,
       buttonLabel,
+      redirectUrl,
     } = await req.json();
 
     if (!title || !description || !price || !duration || !buttonLabel) {
@@ -41,6 +42,7 @@ export const POST = async (req: NextRequest) => {
       tag: tag || "", // Tag opcional
       type: "Buy", // Always "Buy" for products
       buttonLabel,
+      redirectUrl: redirectUrl || "", // Redirect URL opcional
     });
 
     await newProduct.save();

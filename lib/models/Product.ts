@@ -9,6 +9,7 @@ export interface IProduct extends Document {
   tag?: string;
   type: "Book" | "Buy" | "Contact";
   buttonLabel: string;
+  redirectUrl?: string;
   order?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -23,6 +24,7 @@ const ProductSchema: Schema = new Schema({
   tag: { type: String, default: "", trim: true, maxlength: 50 },
   type: { type: String, enum: ["Book", "Buy", "Contact"], required: true },
   buttonLabel: { type: String, required: true },
+  redirectUrl: { type: String, default: "" },
   order: { type: Number, default: 0 },
 }, { timestamps: true });
 

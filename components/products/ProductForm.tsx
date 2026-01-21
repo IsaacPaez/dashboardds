@@ -33,6 +33,11 @@ const formSchema = z.object({
   tag: z.string().max(50, "Tag cannot exceed 50 characters").optional(),
   type: z.literal("Buy"), // Always "Buy" for products
   buttonLabel: z.string().min(1, "Button label is required").max(20),
+  redirectUrl: z.string().refine((val) => {
+    if (!val) return true; // Allow empty string
+    // Allow internal routes starting with / or full URLs
+    return val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://');
+  }, { message: "Must be a valid URL or internal route (e.g., /page or https://example.com)" }).optional().or(z.literal("")),
 });
 
 interface ProductFormProps {
@@ -45,6 +50,7 @@ interface ProductFormProps {
     duration: number;
     tag?: string;
     buttonLabel: string;
+    redirectUrl?: string;
   } | null;
 }
 
@@ -64,6 +70,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
       tag: initialData?.tag || "",
       type: "Buy",
       buttonLabel: initialData?.buttonLabel || "",
+      redirectUrl: initialData?.redirectUrl ?? "",
     },
   });
 
@@ -239,6 +246,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                   <FormLabel>Button Label *</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter button label (20 characters max)" {...field} maxLength={20} className="border-gray-300 rounded-md shadow-sm" required />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="redirectUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Redirect URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., /lessons or https://example.com" {...field} className="border-gray-300 rounded-md shadow-sm" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

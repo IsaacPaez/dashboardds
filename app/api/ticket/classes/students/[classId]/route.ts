@@ -4,7 +4,7 @@ import Order from "@/lib/models/Order";
 import Payment from "@/lib/models/Payments";
 import TicketClass from "@/lib/models/TicketClass";
 // import Location from "../../../../../../lib/models/Locations";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 import { NextRequest, NextResponse } from "next/server";
 
 // interface Student {
@@ -27,7 +27,16 @@ import { NextRequest, NextResponse } from "next/server";
 // }
 
 export async function GET(req: NextRequest) {
-  await connectToDB();
+  try {
+    await dbConnect();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      { success: false, message: "Database connection error", error: String(error) },
+      { status: 500 }
+    );
+  }
+  
   const classId = req.url.split("/").pop();
   
   const ticketClass = await TicketClass.findById(classId).exec();
@@ -63,21 +72,26 @@ export async function GET(req: NextRequest) {
     let citationNumber = "";
     let citationTicket = "";
     let courseCountry = "";
-    
+
     if (typeof studentEntry === 'string') {
       studentId = studentEntry;
     } else if (studentEntry && typeof studentEntry === 'object') {
       // Check if it's an object with studentId property
-      if (studentEntry.studentId) {
-        studentId = studentEntry.studentId.toString();
+      if ('studentId' in studentEntry && studentEntry.studentId) {
+        studentId = studentEntry.studentId;
         // Get the reason and other fields from the enrollment object
         enrollmentReason = studentEntry.reason || "";
         citationNumber = studentEntry.citation_number || "";
         citationTicket = studentEntry.citation_ticket || "";
         courseCountry = studentEntry.course_country || "";
       } else {
-        // If it's an ObjectId, convert it to string
-        studentId = studentEntry.toString();
+        // Last resort: try toString on the object itself
+        studentId = studentEntry;
+      }
+
+      // Convert ObjectId to string if needed
+      if (studentId && typeof studentId === 'object' && studentId.toString) {
+        studentId = studentId.toString();
       }
     } else {
       continue;
@@ -156,7 +170,7 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    await connectToDB();
+    await dbConnect();
     const classId = req.url.split("/").pop();
     const body = await req.json();
     const { id, certn, payedAmount, paymentMethod, citation_number, ...dynamicFields } = body;

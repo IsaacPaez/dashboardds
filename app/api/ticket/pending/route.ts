@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import TicketClass from "@/lib/models/TicketClass";
-import { connectToDB } from "@/lib/mongoDB";
+import dbConnect from "@/lib/dbConnect";
 
 export async function GET() {
   try {
-    await connectToDB();
+    await dbConnect();
     
     // Obtener todas las ticket classes que tienen studentRequests pendientes
     const ticketClasses = await TicketClass.find({

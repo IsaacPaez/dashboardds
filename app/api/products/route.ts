@@ -22,6 +22,7 @@ export const POST = async (req: NextRequest) => {
       duration,
       tag,
       buttonLabel,
+      redirectUrl,
     } = await req.json();
 
     if (!title || !description || !price || !duration || !buttonLabel) {
@@ -41,6 +42,7 @@ export const POST = async (req: NextRequest) => {
       tag: tag || "", // Tag opcional
       type: "Buy", // Always "Buy" for products
       buttonLabel,
+      redirectUrl: redirectUrl || "", // Redirect URL opcional
     });
 
     await newProduct.save();
@@ -56,7 +58,7 @@ export const GET = async () => {
   try {
     await connectToDB();
 
-    const products = await Product.find().sort({ createdAt: "desc" });
+    const products = await Product.find().sort({ order: 1, createdAt: "desc" });
 
     return NextResponse.json(products, { status: 200 });
   } catch (err) {

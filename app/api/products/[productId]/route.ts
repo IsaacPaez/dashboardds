@@ -30,6 +30,7 @@ export const GET = async (req: NextRequest) => {
       tag: product.tag, // 🔥 Incluir `tag`
       type: product.type, // 🔥 Incluir `type`
       buttonLabel: product.buttonLabel, // 🔥 Incluir `buttonLabel`
+      redirectUrl: product.redirectUrl, // 🔥 Incluir `redirectUrl`
     }, { status: 200 });
 
   } catch (error) {
@@ -52,6 +53,7 @@ export const POST = async (req: NextRequest) => {
       duration,
       tag,
       buttonLabel,
+      redirectUrl,
     } = await req.json();
 
     if (!title || !description || !price || !duration || !buttonLabel) {
@@ -70,6 +72,7 @@ export const POST = async (req: NextRequest) => {
       tag: tag || "", // Tag opcional
       type: "Buy", // Always "Buy" for products
       buttonLabel,
+      redirectUrl: redirectUrl || "", // Redirect URL opcional
     });
 
     await newProduct.save();

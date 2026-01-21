@@ -64,6 +64,14 @@ export default function Page() {
         accessorKey: "certn",
         header: "Certificate Number",
       },
+      {
+        accessorKey: "reason",
+        header: "Enrollment Reason",
+        cell: ({ row }) => {
+          const value = row.getValue("reason") as any;
+          return value || "-";
+        },
+      },
     ];
 
     // Add dynamic columns based on template variables
@@ -91,7 +99,10 @@ export default function Page() {
           'student_name',
           'student_full_name',
           'classType',
-          'classTitle'
+          'classTitle',
+          'reason',
+          'enrollmentReason',
+          'enrollment_reason'
         ];
         
         // Also check if the label contains these words
@@ -106,7 +117,8 @@ export default function Page() {
           'paid amount',
           'certificate number',
           'class type',
-          'class title'
+          'class title',
+          'enrollment reason'
         ];
         
         const shouldSkip = skipKeys.includes(variable.key.toLowerCase()) || 

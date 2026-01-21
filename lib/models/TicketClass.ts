@@ -6,6 +6,7 @@ export interface IStudentRequest {
   requestDate: Date;
   status: 'pending' | 'accepted' | 'rejected';
   paymentMethod?: 'online' | 'local';
+  reason?: string;
 }
 
 export interface IStudentEnrollment {
@@ -87,6 +88,7 @@ const TicketClassSchema: Schema = new Schema({
     requestDate: { type: Date, default: Date.now },
     status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' },
     paymentMethod: { type: String, enum: ['online', 'local'] },
+    reason: { type: String },
   }],
 }, { timestamps: true });
 

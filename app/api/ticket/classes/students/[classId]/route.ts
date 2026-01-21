@@ -66,19 +66,29 @@ export async function GET(req: NextRequest) {
   const studentsArray = Array.isArray(ticketClass.students) ? ticketClass.students : [];
   
   for (const studentEntry of studentsArray) {
-    // Handle both cases: direct ID strings or enrollment objects
+    // Handle both cases: direct ID strings/ObjectId or object with studentId
     let studentId;
+    let enrollmentReason = "";
+    let citationNumber = "";
+    let citationTicket = "";
+    let courseCountry = "";
+
     if (typeof studentEntry === 'string') {
       studentId = studentEntry;
     } else if (studentEntry && typeof studentEntry === 'object') {
-      // If it's an enrollment object with studentId field, extract it
+      // Check if it's an object with studentId property
       if ('studentId' in studentEntry && studentEntry.studentId) {
         studentId = studentEntry.studentId;
+        // Get the reason and other fields from the enrollment object
+        enrollmentReason = studentEntry.reason || "";
+        citationNumber = studentEntry.citation_number || "";
+        citationTicket = studentEntry.citation_ticket || "";
+        courseCountry = studentEntry.course_country || "";
       } else {
         // Last resort: try toString on the object itself
         studentId = studentEntry;
       }
-      
+
       // Convert ObjectId to string if needed
       if (studentId && typeof studentId === 'object' && studentId.toString) {
         studentId = studentId.toString();
@@ -121,10 +131,10 @@ export async function GET(req: NextRequest) {
         timeZone: "UTC",
       }),
       sex: user.sex,
-      reason: "", // These fields are no longer stored in studentEntry
-      country_ticket: "",
-      course_country: "",
-      citation_number: cert?.citation_number || "", // Get from certificate data
+      reason: enrollmentReason, // Get from student enrollment object
+      country_ticket: citationTicket,
+      course_country: courseCountry,
+      citation_number: citationNumber || cert?.citation_number || "", // Get from enrollment or certificate data
       licenseNumber: user.licenseNumber,
       // Add ticket class data
       locationId: ticketClass.locationId,

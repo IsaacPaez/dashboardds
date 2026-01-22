@@ -158,7 +158,7 @@ const TicketCalendar = ({
       return;
     }
 
-    // Normal click: open modal
+    // Normal click: open modal (with isPast flag for read-only mode)
     setSelectedSlot({
       _id: ticketClass._id,
       date: ticketClass.date?.slice(0, 10) || "",

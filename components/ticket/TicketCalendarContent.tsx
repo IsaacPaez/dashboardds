@@ -160,11 +160,7 @@ export const TicketCalendarContent = ({
           </div>
         </div>
       ) : (
-        <div className="
-        calendar-container
-        overflow-x-auto
-        -mx-2 sm:mx-0
-      ">
+        <div className="calendar-container overflow-x-auto -mx-2 sm:mx-0">
         <div className="min-w-[640px]">
           <FullCalendar
             plugins={[timeGridPlugin, interactionPlugin]}
@@ -198,11 +194,17 @@ export const TicketCalendarContent = ({
               minute: '2-digit',
               hour12: true
             }}
+            eventTimeFormat={{
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            }}
             dayHeaderFormat={{
               weekday: 'short',
               month: 'numeric',
               day: 'numeric'
             }}
+            hiddenDays={[0]}
           />
         </div>
       </div>

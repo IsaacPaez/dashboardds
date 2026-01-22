@@ -191,6 +191,11 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
 
   const handleEventClick = (clickInfo: any) => {
     try {
+      // Check if the event is in the past
+      const eventStart = clickInfo.event.start;
+      const now = new Date();
+      const isPastEvent = eventStart < now;
+
       // Check if the click was on the checkbox
       const clickedElement = (clickInfo.jsEvent.target as HTMLElement);
       const isCheckboxClick = clickedElement.classList.contains('selection-checkbox') || 
@@ -223,6 +228,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
         start: clickInfo.event.start.toISOString(),
         end: clickInfo.event.end.toISOString(),
         classType: clickInfo.event.extendedProps?.classType,
+        isPast: isPastEvent, // Flag to indicate if event is in the past
         extendedProps: {
           classType: clickInfo.event.extendedProps?.classType,
           status: clickInfo.event.extendedProps?.status,
@@ -615,6 +621,37 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             min-height: 35px !important;
           }
         }
+
+        /* Past days styling - grey out past dates */
+        .fc .fc-day-past {
+          background-color: #f3f4f6 !important;
+        }
+
+        .fc .fc-day-past .fc-col-header-cell-cushion {
+          color: #9ca3af !important;
+        }
+
+        .fc .fc-day-past .fc-timegrid-slot {
+          background-color: #f3f4f6 !important;
+        }
+
+        /* Events on past days should appear muted and non-clickable */
+        .fc .fc-day-past .fc-timegrid-event {
+          opacity: 0.6 !important;
+          cursor: not-allowed !important;
+        }
+
+        /* Disable hover effect on past events */
+        .fc .fc-day-past .fc-timegrid-event:hover {
+          transform: none !important;
+          box-shadow: none !important;
+          opacity: 0.6 !important;
+        }
+
+        /* Past time slots on today */
+        .fc .fc-day-today .fc-timegrid-slot.fc-timegrid-slot-lane {
+          position: relative;
+        }
       `}</style>
 
       <div className="relative" style={{ opacity: loading ? 0.5 : 1, transition: 'opacity 0.3s' }}>
@@ -632,6 +669,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             selectMirror={true}
             dayMaxEvents={true}
             weekends={true}
+            hiddenDays={[0]}
             events={events}
             select={handleDateSelect}
             eventClick={handleEventClick}
@@ -717,10 +755,15 @@ const Calendar: React.FC<CalendarProps> = ({ selectedInstructor, targetDate, tar
             slotMaxTime="22:00:00"
             slotDuration="00:15:00"
             allDaySlot={false}
-            eventTimeFormat={{
-              hour: "2-digit",
+            slotLabelFormat={{
+              hour: "numeric",
               minute: "2-digit",
-              hour12: false,
+              hour12: true,
+            }}
+            eventTimeFormat={{
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
             }}
             eventClassNames="cursor-pointer"
             eventInteractive={true}

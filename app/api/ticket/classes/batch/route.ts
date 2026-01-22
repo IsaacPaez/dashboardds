@@ -43,6 +43,14 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Validar que el array no esté vacío
+    if (body.length === 0) {
+      return NextResponse.json(
+        { error: "No classes to create. The array is empty." },
+        { status: 400 }
+      );
+    }
     
     // console.log(`[API] ticket/classes/batch POST - Creating ${body.length} classes in batch`);
     

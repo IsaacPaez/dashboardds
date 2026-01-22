@@ -55,6 +55,7 @@ const createRecurringClasses = async (data: TicketFormData): Promise<void> => {
       students: data.students,
       spots: data.spots,
       duration: data.duration,
+      status: data.status || 'available',
       studentRequests: data.studentRequests || [],
     });
 
@@ -102,6 +103,7 @@ const createSingleClass = async (data: TicketFormData): Promise<void> => {
       students: data.students,
       spots: data.spots,
       duration: data.duration,
+      status: data.status || 'available',
       studentRequests: data.studentRequests || [],
     }),
   });

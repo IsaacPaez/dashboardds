@@ -469,3 +469,29 @@ body,
 .ProseMirror h3 {
   font-size: 1.5em;
 }
+
+/* FullCalendar Past Days Styling */
+.fc .fc-day-past {
+  background-color: #f3f4f6 !important;
+}
+
+.fc .fc-day-past .fc-col-header-cell-cushion {
+  color: #9ca3af !important;
+}
+
+.fc .fc-day-past .fc-timegrid-slot {
+  background-color: #f3f4f6 !important;
+}
+
+/* Events on past days should appear muted and non-clickable */
+.fc .fc-day-past .fc-timegrid-event {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Disable hover effect on past events */
+.fc .fc-day-past .fc-timegrid-event:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 0.6 !important;
+}
